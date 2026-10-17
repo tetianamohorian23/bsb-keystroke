@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+
+# Build output
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Collected data (contains participants' personal data)
+backend/sessions.sqlite3
+*.sqlite3-journal
+
+# Secrets
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local backups
+*.backup
+.refactor-backup/

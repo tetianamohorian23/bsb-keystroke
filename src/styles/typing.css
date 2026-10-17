@@ -1,0 +1,202 @@
+/* Karta s písaním (používa ju meranie aj rozpoznávanie) */
+.run-card {
+  padding: 22px 25px;
+}
+
+.status-row,
+.run-heading,
+.progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status-row {
+  padding-bottom: 19px;
+  border-bottom: 1px solid var(--line);
+}
+
+.status-row strong {
+  font: 500 1.2rem "DM Mono", monospace;
+}
+
+.status-row small {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.run-heading {
+  padding: 20px 0 12px;
+}
+
+.timer-dot {
+  color: var(--orange);
+  font-size: 0.7rem;
+}
+
+.phrase {
+  padding: 15px 17px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #0e1111;
+  font: 500 1.3rem "DM Mono", monospace;
+  word-break: break-all;
+}
+
+.phrase span {
+  color: #3f4744;
+}
+
+.phrase .bad {
+  text-decoration: underline;
+}
+
+.phrase .cur {
+  color: var(--ink);
+  box-shadow: inset 0 -2px var(--orange);
+}
+
+.typing-input {
+  margin-top: 10px;
+  font: 500 0.95rem "DM Mono", monospace;
+}
+
+.typing-input::placeholder {
+  color: #59615f;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 24px;
+  margin-top: 8px;
+}
+
+.row p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.row .attempt-count {
+  font-family: "DM Mono", monospace;
+}
+
+/* Graf rytmu a postup (len počas merania) */
+.roll {
+  margin-top: 10px;
+}
+
+.rhythm-canvas {
+  display: block;
+  width: 100%;
+  height: 104px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #0e1111;
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.legend b {
+  display: inline-block;
+  width: 15px;
+  height: 6px;
+  margin-right: 5px;
+  border-radius: 3px;
+}
+
+.legend-a {
+  background: var(--orange);
+}
+
+.legend-b {
+  background: var(--gold);
+  opacity: 0.65;
+}
+
+.progress-meta {
+  margin-top: 11px;
+  color: var(--muted);
+  font: 600 0.82rem/1.2 "DM Mono", monospace;
+  letter-spacing: 0.09em;
+}
+
+.progress-meta b {
+  color: var(--orange);
+  font: 500 0.7rem "DM Mono", monospace;
+}
+
+.bar {
+  height: 5px;
+  margin-top: 7px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #29302e;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--orange), var(--gold));
+  transition: width 0.35s;
+}
+
+/* Kompaktná verzia počas merania (main.running) */
+.running .run-card {
+  padding: 17px 20px;
+  border-radius: 16px;
+}
+
+.running .status-row small {
+  font-size: 0.82rem;
+}
+
+.running .timer-dot {
+  font-size: 0.85rem;
+}
+
+.running .run-heading {
+  padding: 14px 0 9px;
+}
+
+.running .run-heading h2 {
+  font-size: 1.15rem;
+}
+
+.running .phrase {
+  padding: 11px 14px;
+  font-size: 1.1rem;
+}
+
+.running .typing-input {
+  margin-top: 8px;
+  padding: 10px 12px;
+  font-family: Manrope, system-ui, sans-serif;
+  letter-spacing: 0;
+}
+
+.running .row p {
+  font-size: 0.86rem;
+}
+
+.running .row .attempt-count {
+  font-family: Manrope, system-ui, sans-serif;
+}
+
+@media (max-width: 700px) {
+  .run-card {
+    padding: 17px;
+  }
+
+  .run-heading h2 {
+    font-size: 1.15rem;
+  }
+}

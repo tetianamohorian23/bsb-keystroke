@@ -1,0 +1,33 @@
+.identify-results {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.identify-results h2 {
+  margin-bottom: 14px;
+}
+
+.match {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.match b {
+  color: var(--gold);
+  font-family: "DM Mono", monospace;
+}
+
+.identify-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+
+.identify-actions button {
+  margin-top: 0 !important;
+}

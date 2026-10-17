@@ -1,0 +1,58 @@
+.setup-layout {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: clamp(38px, 8vw, 110px);
+  min-height: calc(100vh - 180px);
+}
+
+.metric-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.metric-chips span {
+  padding: 13px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  font: 500 0.88rem "DM Mono", monospace;
+}
+
+.metric-chips b {
+  margin-right: 7px;
+  color: var(--gold);
+  font-size: 1.35rem;
+}
+
+.setup-card {
+  padding: 28px;
+}
+
+.privacy-note {
+  display: block;
+  margin-top: 13px;
+  color: #646d69;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 700px) {
+  .setup-layout {
+    display: block;
+    min-height: 0;
+  }
+
+  .intro {
+    margin: 18px 0 30px;
+  }
+
+  .metric-chips {
+    margin-top: 24px;
+  }
+
+  .setup-card {
+    padding: 19px;
+  }
+}

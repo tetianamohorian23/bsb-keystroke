@@ -1,0 +1,70 @@
+/* Klávesnica v pozadí: jedna spoločná vrstva pre všetky obrazovky. */
+.kb-bg {
+  position: fixed;
+  z-index: 0;
+  inset: auto 0 26px;
+  height: 210px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.55;
+  mask-image: linear-gradient(transparent, #000 30%);
+}
+
+.kb {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: min(1100px, 100%);
+  margin: 20px auto 0;
+  transform: perspective(900px) rotateX(22deg) translateY(26px);
+  transform-origin: bottom;
+}
+
+.kr {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.k {
+  flex: 1;
+  height: 31px;
+  padding: 4px 7px;
+  border: 1px solid #39322e;
+  border-radius: 5px;
+  background: #191716;
+  color: #82766c;
+  font: 500 0.56rem "DM Mono", monospace;
+  text-transform: uppercase;
+}
+
+.k.on {
+  background: var(--orange);
+  color: #24140f;
+  box-shadow: 0 0 20px var(--orange);
+  transform: translateY(2px);
+}
+
+/* Počas merania je klávesnica výraznejšia. */
+body:has(main.running) .kb-bg {
+  opacity: 0.62;
+  mask-image: linear-gradient(transparent, #000 25%);
+}
+
+body:has(main.running) .k {
+  background: #1d2523;
+  border-color: #3b4945;
+  color: #8d9b95;
+}
+
+body:has(main.running) .k.on {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: #24140f;
+}
+
+@media (max-width: 700px) {
+  .k {
+    font-size: 0.45rem;
+  }
+}

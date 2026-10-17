@@ -1,0 +1,117 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.f {
+  display: block;
+  margin: 0 0 8px;
+  color: #d9ddda;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #101313;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px #ff754d20;
+}
+
+/* Checkbox so súhlasom */
+.check {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #101313;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.check span {
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.check input {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex: 0 0 22px;
+  width: 22px;
+  min-width: 22px;
+  max-width: 22px;
+  height: 22px;
+  min-height: 22px;
+  margin: 0;
+  padding: 0;
+  border: 2px solid #68716d;
+  border-radius: 5px;
+  background: #101313;
+  accent-color: var(--orange);
+}
+
+.check input:checked {
+  border-color: var(--orange);
+  background: var(--orange);
+}
+
+.check input:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 7px;
+  height: 11px;
+  border: solid #21120d;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+/* Nastavenie relácie: vlastná šípka v selecte a čitateľný placeholder */
+.setup-card select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 54px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 25px) 50%,
+    calc(100% - 17px) 50%;
+  background-size: 9px 9px, 9px 9px;
+  background-repeat: no-repeat;
+}
+
+.setup-card select:focus {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--orange) 50%),
+    linear-gradient(135deg, var(--orange) 50%, transparent 50%);
+}
+
+.setup-card input::placeholder {
+  color: #79817d;
+  opacity: 1;
+  text-transform: none;
+}
