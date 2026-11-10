@@ -117,9 +117,10 @@ def build_templates() -> tuple[dict[str, tuple[list[float], list[float]]], int]:
     return templates, evaluated
 
 
-def rank_attempt(rows: list[dict]) -> tuple[list[dict], bool]:
+def rank_attempt(rows: list[dict], templates: dict | None = None) -> tuple[list[dict], bool]:
     vector = attempt_features(rows)
-    templates, _ = build_templates()
+    if templates is None:
+        templates, _ = build_templates()
     if not templates:
         raise LookupError("No valid participant templates are available")
     distances = []
@@ -147,11 +148,15 @@ def evaluate_templates() -> dict:
     total = top1 = top3 = 0
     if frame.empty or not templates:
         return {"top1": 0.0, "top3": 0.0, "total": 0, "confusion": {}}
-    for (actual, rep), group in frame.groupby(["participant_id", "rep"], sort=True):
+    # Group per session: repetitions of different sessions must not be merged.
+    # Templates are built once above and reused for every test attempt.
+    for (actual, _session_id, rep), group in frame.groupby(
+        ["participant_id", "session_id", "rep"], sort=True
+    ):
         if int(rep) <= 10:
             continue
         try:
-            matches, unknown = rank_attempt(group.to_dict("records"))
+            matches, unknown = rank_attempt(group.to_dict("records"), templates)
         except (ValueError, LookupError):
             continue
         predicted = "unknown" if unknown else matches[0]["name"]

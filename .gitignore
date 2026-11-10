@@ -30,3 +30,12 @@ Thumbs.db
 # Local backups
 *.backup
 .refactor-backup/
+
+
+
+# Dokumentácia a video (nie sú súčasťou repozitára)
+docs/
+video/
+docs.zip
+Dokumentacia_BSB.docx
+*.dotm
