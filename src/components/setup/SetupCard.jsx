@@ -1,6 +1,6 @@
-import { DEVICES, KEYBOARDS } from "../../constants";
+import { DEVICES, KEYBOARDS, MODES } from "../../constants";
 
-export default function SetupCard({ setup, onChange, onStart, onIdentify }) {
+export default function SetupCard({ setup, onChange, onStart, onIdentify, onCompare }) {
   const set = (field) => (e) => onChange({ ...setup, [field]: e.target.value });
 
   return (
@@ -41,6 +41,18 @@ export default function SetupCard({ setup, onChange, onStart, onIdentify }) {
             ))}
           </select>
         </div>
+        <div className="full">
+          <label className="f" htmlFor="mode">
+            Čo budete písať
+          </label>
+          <select id="mode" value={setup.mode} onChange={set("mode")}>
+            {Object.entries(MODES).map(([key, { label }]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
         <label className="check full">
           <input
             type="checkbox"
@@ -58,6 +70,9 @@ export default function SetupCard({ setup, onChange, onStart, onIdentify }) {
       </button>
       <button className="ghost" onClick={onIdentify}>
         Rozpoznať pokus
+      </button>
+      <button className="ghost" onClick={onCompare}>
+        Porovnať vetu a slovo
       </button>
       <small className="privacy-note">
         Údaje zostávajú chránené a slúžia iba na účely projektu.

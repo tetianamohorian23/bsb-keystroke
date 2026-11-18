@@ -9,7 +9,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 DB = Path(__file__).with_name("sessions.sqlite3")
-KEY_COUNT = 37
+# Number of recorded key presses per attempt for each typing mode.
+# "phrase": "Every keystroke tells a unique story."   "word": "biometrics"
+MODE_KEYS = {"phrase": 37, "word": 10}
+DEFAULT_MODE = "phrase"  # sessions saved before modes existed are phrase sessions
 app = FastAPI(title="Keystroke dynamics API")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
@@ -20,29 +23,58 @@ class Session(BaseModel):
 
 class IdentifyRequest(BaseModel):
     rows: list[dict] = Field(default_factory=list)
+    mode: str = DEFAULT_MODE
 
 
-def events_dataframe() -> pd.DataFrame:
-    """Read one row per keyboard event from the session store."""
+def check_mode(mode: str) -> str:
+    if mode not in MODE_KEYS:
+        raise HTTPException(status_code=422, detail=f"mode must be one of {sorted(MODE_KEYS)}")
+    return mode
+
+
+def events_dataframe(mode: str | None = None, participants: set[str] | None = None) -> pd.DataFrame:
+    """Read one row per keyboard event from the session store.
+
+    Optionally restrict to one typing mode and/or a set of participants.
+    """
     with sqlite3.connect(DB) as db:
         records = db.execute(
-            "SELECT participant_id, rows_json FROM sessions ORDER BY id"
+            "SELECT participant_id, meta_json, rows_json FROM sessions ORDER BY id"
         ).fetchall()
     rows = []
-    for participant_id, rows_json in records:
-        rows.extend({**event, "participant_id": participant_id} for event in json.loads(rows_json))
+    for participant_id, meta_json, rows_json in records:
+        session_mode = json.loads(meta_json).get("mode", DEFAULT_MODE)
+        if mode is not None and session_mode != mode:
+            continue
+        if participants is not None and participant_id not in participants:
+            continue
+        rows.extend(
+            {**event, "participant_id": participant_id, "mode": session_mode}
+            for event in json.loads(rows_json)
+        )
     return pd.DataFrame(rows)
 
 
-def attempt_features(rows: list[dict]) -> list[float]:
+def participants_by_mode() -> dict[str, set[str]]:
+    with sqlite3.connect(DB) as db:
+        records = db.execute("SELECT participant_id, meta_json FROM sessions").fetchall()
+    result = {mode: set() for mode in MODE_KEYS}
+    for participant_id, meta_json in records:
+        mode = json.loads(meta_json).get("mode", DEFAULT_MODE)
+        if mode in result:
+            result[mode].add(participant_id)
+    return result
+
+
+def attempt_features(rows: list[dict], key_count: int) -> list[float]:
     frame = pd.DataFrame(rows)
     if frame.empty or "event" not in frame or "t_ms" not in frame:
         raise ValueError("rows must contain keyboard events with event and t_ms")
     frame = frame.sort_values("seq" if "seq" in frame else "t_ms")
     downs = frame[frame["event"] == "down"].copy()
     ups = frame[frame["event"] == "up"].copy()
-    if len(downs) != KEY_COUNT or len(ups) != KEY_COUNT:
-        raise ValueError(f"an attempt must contain exactly {KEY_COUNT} key presses and releases")
+    if len(downs) != key_count or len(ups) != key_count:
+        raise ValueError(f"an attempt must contain exactly {key_count} key presses and releases")
     down_times = pd.to_numeric(downs["t_ms"], errors="coerce").to_numpy()
     up_times = pd.to_numeric(ups["t_ms"], errors="coerce").to_numpy()
     if pd.isna(down_times).any() or pd.isna(up_times).any():
@@ -60,69 +92,40 @@ def attempt_features(rows: list[dict]) -> list[float]:
     return values
 
 
-def build_templates() -> tuple[dict[str, tuple[list[float], list[float]]], int]:
-    frame = events_dataframe()
-
+def build_templates(frame: pd.DataFrame, mode: str) -> dict[str, tuple[list[float], list[float]]]:
+    """Per-participant template (mean, std) from repetitions 1-10 of one mode."""
     if frame.empty:
-        return {}, 0
-
+        return {}
+    key_count = MODE_KEYS[mode]
+    vectors_by_participant = defaultdict(list)
     # Each session is an independent set of repetitions.
-    # This prevents events from different sessions being mixed together.
-    attempts = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-
-    for (participant, session_id, rep), group in frame.groupby(
+    for (participant, _session_id, rep), group in frame.groupby(
         ["participant_id", "session_id", "rep"], sort=True
     ):
-        attempts[str(participant)][str(session_id)][int(rep)].extend(
-            group.to_dict("records")
-        )
-
-    templates = {}
-    evaluated = 0
-
-    for participant, sessions in attempts.items():
-        vectors = []
-
-        for session_id, by_rep in sessions.items():
-            # Repetitions 1-10 are used to build the participant template.
-            for rep in range(1, 11):
-                if rep not in by_rep:
-                    continue
-
-                try:
-                    vectors.append(attempt_features(by_rep[rep]))
-                except ValueError:
-                    # Ignore invalid repetitions/sessions.
-                    continue
-
-        if not vectors:
+        if not 1 <= int(rep) <= 10:
             continue
-
+        try:
+            vectors_by_participant[str(participant)].append(
+                attempt_features(group.to_dict("records"), key_count)
+            )
+        except ValueError:
+            continue  # ignore invalid repetitions
+    templates = {}
+    for participant, vectors in vectors_by_participant.items():
         matrix = pd.DataFrame(vectors)
-        mean = matrix.mean().tolist()
-        std = matrix.std(ddof=0).replace(0, 1).tolist()
-
-        templates[participant] = (mean, std)
-
-        # Count valid evaluation repetitions after the first 10.
-        for session_id, by_rep in sessions.items():
-            for rep in range(11, 16):
-                if rep in by_rep:
-                    try:
-                        attempt_features(by_rep[rep])
-                        evaluated += 1
-                    except ValueError:
-                        continue
-
-    return templates, evaluated
+        templates[participant] = (
+            matrix.mean().tolist(),
+            matrix.std(ddof=0).replace(0, 1).tolist(),
+        )
+    return templates
 
 
-def rank_attempt(rows: list[dict], templates: dict | None = None) -> tuple[list[dict], bool]:
-    vector = attempt_features(rows)
+def rank_attempt(rows: list[dict], mode: str, templates: dict | None = None) -> tuple[list[dict], bool]:
+    vector = attempt_features(rows, MODE_KEYS[mode])
     if templates is None:
-        templates, _ = build_templates()
+        templates = build_templates(events_dataframe(mode), mode)
     if not templates:
-        raise LookupError("No valid participant templates are available")
+        raise LookupError(f"No valid participant templates are available for mode '{mode}'")
     distances = []
     for participant, (mean, std) in templates.items():
         distance = sqrt(sum(((value - center) / scale) ** 2 for value, center, scale in zip(vector, mean, std)))
@@ -141,13 +144,17 @@ def rank_attempt(rows: list[dict], templates: dict | None = None) -> tuple[list[
     return results, unknown
 
 
-def evaluate_templates() -> dict:
-    frame = events_dataframe()
-    templates, _ = build_templates()
-    confusion = defaultdict(lambda: defaultdict(int))
-    total = top1 = top3 = 0
+def evaluate_templates(mode: str = DEFAULT_MODE, participants: set[str] | None = None) -> dict:
+    """Top-1/top-3 accuracy for one mode (templates: reps 1-10, tests: reps 11-15)."""
+    frame = events_dataframe(mode, participants)
+    templates = build_templates(frame, mode)
+    base = {"mode": mode, "features": 2 * MODE_KEYS[mode] - 1}
     if frame.empty or not templates:
-        return {"top1": 0.0, "top3": 0.0, "total": 0, "confusion": {}}
+        return {**base, "top1": 0.0, "top3": 0.0, "unknown_rate": 0.0, "avg_time_s": 0.0,
+                "total": 0, "participants": 0, "confusion": {}}
+    confusion = defaultdict(lambda: defaultdict(int))
+    total = top1 = top3 = unknown_count = 0
+    durations = []
     # Group per session: repetitions of different sessions must not be merged.
     # Templates are built once above and reused for every test attempt.
     for (actual, _session_id, rep), group in frame.groupby(
@@ -156,7 +163,7 @@ def evaluate_templates() -> dict:
         if int(rep) <= 10:
             continue
         try:
-            matches, unknown = rank_attempt(group.to_dict("records"), templates)
+            matches, unknown = rank_attempt(group.to_dict("records"), mode, templates)
         except (ValueError, LookupError):
             continue
         predicted = "unknown" if unknown else matches[0]["name"]
@@ -164,12 +171,30 @@ def evaluate_templates() -> dict:
         total += 1
         top1 += predicted == actual
         top3 += actual in names
+        unknown_count += unknown
+        durations.append(float(pd.to_numeric(group["t_ms"]).max()) / 1000)
         confusion[str(actual)][predicted] += 1
     return {
+        **base,
         "top1": round(top1 / total * 100, 2) if total else 0.0,
         "top3": round(top3 / total * 100, 2) if total else 0.0,
+        "unknown_rate": round(unknown_count / total * 100, 2) if total else 0.0,
+        "avg_time_s": round(sum(durations) / len(durations), 2) if durations else 0.0,
         "total": total,
+        "participants": len(templates),
         "confusion": {actual: dict(predictions) for actual, predictions in confusion.items()},
+    }
+
+
+def compare_modes() -> dict:
+    """Compare modes on participants who completed every mode (fair comparison)."""
+    by_mode = participants_by_mode()
+    common = set.intersection(*by_mode.values())
+    return {
+        "common_participants": sorted(common),
+        "participants_per_mode": {mode: len(names) for mode, names in by_mode.items()},
+        "common": {mode: evaluate_templates(mode, common) for mode in MODE_KEYS},
+        "all": {mode: evaluate_templates(mode) for mode in MODE_KEYS},
     }
 
 
@@ -234,6 +259,7 @@ def get_stats():
 def create_session(payload: Session):
     participant = str(payload.meta.get("participant_id", "")).strip()
     session_id = str(payload.meta.get("session_id", "")).strip()
+    check_mode(str(payload.meta.get("mode", DEFAULT_MODE)))
     if not participant or not session_id or len(payload.rows) == 0:
         raise HTTPException(status_code=422, detail="meta.participant_id, meta.session_id and rows are required")
     with sqlite3.connect(DB) as db:
@@ -251,7 +277,7 @@ def create_session(payload: Session):
 @app.post("/api/identify")
 def identify(payload: IdentifyRequest):
     try:
-        matches, unknown = rank_attempt(payload.rows)
+        matches, unknown = rank_attempt(payload.rows, check_mode(payload.mode))
     except (ValueError, LookupError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return {
@@ -262,5 +288,10 @@ def identify(payload: IdentifyRequest):
 
 
 @app.get("/api/evaluation")
-def evaluation():
-    return evaluate_templates()
+def evaluation(mode: str = DEFAULT_MODE):
+    return evaluate_templates(check_mode(mode))
+
+
+@app.get("/api/compare")
+def compare():
+    return compare_modes()

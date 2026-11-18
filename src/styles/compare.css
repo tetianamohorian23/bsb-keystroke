@@ -1,0 +1,25 @@
+.compare-table {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.compare-table th {
+  color: var(--gold);
+  font: 500 0.85rem "DM Mono", monospace;
+}
+
+.compare-table td:first-child {
+  color: var(--muted);
+}
+
+.compare-table .bar {
+  margin-top: 6px;
+}

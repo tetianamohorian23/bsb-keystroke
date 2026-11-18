@@ -1,30 +1,32 @@
-import { useState } from "react";
-import { EMPTY_MESSAGE, REPS } from "../../constants";
+import { useEffect, useState } from "react";
+import { REPS } from "../../constants";
 import { saveSession } from "../../utils/api";
+import { downloadCsv } from "../../utils/csv";
 import StatsGrid from "./StatsGrid";
 
 export default function DoneScreen({ meta, rows, summary, onBack }) {
-  const [sending, setSending] = useState(false);
-  const [message, setMessage] = useState(EMPTY_MESSAGE);
+  const [status, setStatus] = useState("sending"); // sending | saved | error
 
+  // Relácia sa uloží automaticky; server ignoruje duplicitné odoslanie (rovnaké session_id).
   const send = async () => {
-    if (sending) return;
-    setSending(true);
+    setStatus("sending");
     try {
-      const { ok, result } = await saveSession(meta, rows);
-      setMessage({
-        text: ok
-          ? result?.status === "already_saved"
-            ? "Táto relácia už bola odoslaná."
-            : "Odoslané."
-          : "Chyba servera. Stiahnite CSV.",
-        kind: ok ? "ok" : "bad",
-      });
+      const { ok } = await saveSession(meta, rows);
+      setStatus(ok ? "saved" : "error");
     } catch {
-      setMessage({ text: "Odoslanie zlyhalo. Skúste znova.", kind: "bad" });
-      setSending(false);
+      setStatus("error");
     }
   };
+
+  useEffect(() => {
+    send();
+  }, []);
+
+  const text = {
+    sending: "Ukladá sa na server…",
+    saved: "Uložené na server.",
+    error: "Uloženie zlyhalo. Skúste znova alebo stiahnite CSV.",
+  }[status];
 
   return (
     <section className="card done-card">
@@ -33,17 +35,27 @@ export default function DoneScreen({ meta, rows, summary, onBack }) {
         Vaše meranie je pripravené. Váš kód: <strong>{summary.id}</strong>
       </p>
       <StatsGrid attempts={REPS} hold={summary.hold} time={summary.time} />
+      <p
+        className={`done-message ${status === "saved" ? "ok" : status === "error" ? "bad" : ""}`}
+        role="status"
+      >
+        {text}
+      </p>
       <div className="row">
-        <button className="ghost" disabled={sending} onClick={send}>
-          {sending ? "Odosiela sa…" : "Odoslať na server"}
-        </button>
-        <button className="ghost" onClick={onBack}>
+        {status === "error" && (
+          <>
+            <button className="ghost" onClick={send}>
+              Skúsiť znova
+            </button>
+            <button className="ghost" onClick={() => downloadCsv(rows, summary.id)}>
+              Stiahnuť CSV
+            </button>
+          </>
+        )}
+        <button className="ghost" disabled={status === "sending"} onClick={onBack}>
           Späť
         </button>
       </div>
-      <p className={`done-message ${message.kind}`} role="status">
-        {message.text}
-      </p>
     </section>
   );
 }

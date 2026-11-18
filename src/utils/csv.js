@@ -3,6 +3,7 @@ const COLUMNS = [
   "session_id",
   "device",
   "keyboard",
+  "mode",
   "rep",
   "seq",
   "event",
