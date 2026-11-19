@@ -1,0 +1,79 @@
+\section{Teoretické východiská}
+\label{sec:teoria}
+
+% Kapitola vychádza z odbornej literatúry (zdroje sú v references.bib).
+% Rozsah má byť najviac 3 strany. Pred odovzdaním skontrolujte, že každé
+% tvrdenie zodpovedá obsahu citovaného zdroja.
+
+\subsection{Behaviorálna biometria}
+
+Biometrická autentifikácia overuje alebo určuje totožnosť človeka podľa jeho
+telesných alebo behaviorálnych vlastností. Behaviorálna biometria vychádza zo
+spôsobu, akým človek koná, a dynamika písania na klávesnici patrí k jej
+najľahšie dostupným podobám: nepotrebuje špeciálny snímač, stačí bežná
+klávesnica a údaje sa dajú zbierať počas písania~\cite{roy2022,shadman2023}.
+Prehľad aktuálnej literatúry poskytuje systematický prehľad zameraný na
+modely dynamiky písania z rokov 2017 až 2022~\cite{roy2022}, ktorý porovnáva
+použité metódy, nastavenia experimentov aj otvorené problémy, a prehľadová
+štúdia o pojmoch, technikách a aplikáciách, ktorá sa venuje aj dátovým súborom,
+písaniu na dotykových zariadeniach a použitiu mimo autentifikácie~\cite{shadman2023}.
+
+Rozlišujú sa dve úlohy: \emph{verifikácia} (overenie, že človek je tým, za koho
+sa vydáva) a \emph{identifikácia} (určenie, ktorému zo známych ľudí sa
+záznam najviac podobá). Táto práca rieši identifikáciu. Podľa typu písaného
+textu sa ďalej rozlišuje písanie \emph{pevného} textu (všetci píšu to isté,
+ako v tejto práci) a písanie \emph{voľného} textu, ktoré umožňuje priebežné
+overovanie počas bežnej práce na počítači~\cite{shadman2023}.
+
+\subsection{Príznaky dynamiky písania}
+
+Základom sú časy stlačenia a uvoľnenia klávesov. Z nich sa odvádzajú dva
+druhy príznakov: doba držania klávesy (čas medzi stlačením a uvoľnením)
+a intervaly medzi po sebe idúcimi klávesmi, ktoré sa v literatúre nazývajú aj
+letové časy (\emph{flight time})~\cite{kaluarachchi2023}. Autori práce o súbore
+DEFT ukazujú, že doplnenie letových časov o vzdialenosť medzi klávesmi
+vytvára príznakovú množinu nezávislú od zariadenia,
+s presnosťou nad 99\,\% a chybovosťou EER pod 10\,\% na troch zariadeniach~\cite{kaluarachchi2023}.
+Zaujímavým zistením je, že aj príznaky založené len na časoch, bez znalosti
+obsahu textu, si zachovávajú uspokojivý výkon pri verifikácii~\cite{stragapede2023}.
+Práve takéto časové príznaky (doby držania a intervaly) používa aj riešenie
+v tejto práci (podkapitola~\ref{sec:priznaky}).
+
+\subsection{Metódy vyhodnotenia}
+
+Pri klasifikácii sa používajú jednoduché štatistické miery vzdialenosti aj
+metódy strojového učenia. Porovnanie klasických algoritmov strojového učenia
+a techník výberu príznakov (filtrovacích a obalových) na úlohe autentifikácie
+podľa dynamiky písania uvádza štúdia~\cite{teotia2023}. Pri voľnom texte sa
+úspešne používajú aj hlboké neurónové siete: rekurentná sieť TypeNet
+dosiahla chybovosť EER 2,2\,\% na fyzickej klávesnici a 9,2\,\% na dotykovej
+a pri nárasti počtu používateľov až do 100\,000 sa chyba zvýšila len mierne~\cite{acien2021},
+a kombinácia konvolučnej a rekurentnej siete (CNN a GRU) dosiahla na voľnom
+texte výsledky porovnateľné s najlepšími predchádzajúcimi prístupmi~\cite{chang2021}.
+Autori porovnania z roku 2026 zdôrazňujú, že výsledky veľmi závisia od výberu
+dátového súboru a spôsobu vyhodnotenia, že hlboké učenie vedie pri voľnom texte
+a že tvrdenia o kvantových prístupoch zatiaľ nie sú podložené~\cite{gundogan2026}.
+Aj preto vznikla verejná výzva KVC, ktorá porovnáva systémy na rovnakých dátach
+a okrem presnosti hodnotí aj spravodlivosť voči demografickým skupinám~\cite{stragapede2023}.
+
+Verifikačné systémy sa najčastejšie hodnotia mierou EER (\emph{equal error
+rate}), teda chybovosťou, pri ktorej je podiel nesprávne prijatých pokusov
+rovnaký ako podiel nesprávne odmietnutých~\cite{acien2021,stragapede2023}.
+Pri identifikácii na malom počte ľudí je
+prirodzenejšie sledovať, či je správny človek na prvom mieste (top-1) alebo
+medzi prvými $k$ (top-$k$); tieto metriky používa aj táto práca
+(podkapitola~\ref{sec:protokol}). Nie sú priamo porovnateľné s EER, preto sa
+výsledky tejto práce nedajú jednoducho porovnávať s číslami z citovaných
+štúdií, ktoré používajú iné dáta a iný protokol.
+
+\subsection{Súkromie a ochrana osobných údajov}
+
+Dynamika písania je citlivý údaj. Behaviorálne príznaky môžu prezradiť aj
+pohlavie, vek, dominantnú ruku či emocionálny stav písajúceho~\cite{baig2022},
+a preto sa navrhujú protokoly, v ktorých server nikdy nevidí biometrické šablóny
+v otvorenej podobe, napríklad s využitím homomorfného šifrovania~\cite{baig2022}.
+Pri právnom posúdení treba brať do úvahy, že terminológia GDPR rozlišuje
+rozpoznávanie osoby a len klasifikáciu jej vlastností (napríklad tzv. mäkkých
+znakov) a že druhý prípad je chránený menej, čo vytvára riziká pre súkromie~\cite{bisztray2021}. Tieto
+úvahy sú dôvodom, prečo sa pri zbere údajov v tejto práci uplatňuje informovaný
+súhlas, minimalizácia údajov a lokálne úložisko (podkapitola~\ref{sec:etika}).

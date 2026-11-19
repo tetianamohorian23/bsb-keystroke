@@ -3,7 +3,7 @@
   grid-template-columns: 1.05fr 0.95fr;
   align-items: center;
   gap: clamp(38px, 8vw, 110px);
-  min-height: calc(100vh - 180px);
+  min-height: calc(100vh - 240px);
 }
 
 .metric-chips {

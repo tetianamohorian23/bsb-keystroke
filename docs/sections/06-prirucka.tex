@@ -1,0 +1,178 @@
+\section{Príručka na používanie riešenia}
+\label{sec:prirucka}
+
+Zdrojový kód je archivovaný v repozitári GitHub~\cite{repo}.
+
+% ----- Požiadavky -----
+\subsection{Požiadavky}
+
+% Odrážkový zoznam.
+\begin{itemize}
+  \item Node.js a npm (vyvíjané s Node.js 24),
+  \item Python 3 (vyvíjané s verziou 3.14),
+  \item prehliadač s podporou \code{canvas} a \code{performance.now()}
+        (testované v Microsoft Edge).
+\end{itemize}
+
+% ----- Inštalácia -----
+\subsection{Inštalácia}
+
+% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
+\begin{lstlisting}
+# 1. Stiahnutie projektu
+git clone https://github.com/tetianamohorian23/bsb-keystroke.git
+cd bsb-keystroke
+
+# 2. Klient (React)
+npm install
+
+# 3. Server (Python) vo vlastnom virtuálnom prostredí
+cd backend
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+pip install -r requirements.txt
+\end{lstlisting}
+
+% ----- Spustenie -----
+\subsection{Spustenie}
+
+Server a klient sa spúšťajú v dvoch samostatných termináloch.
+
+% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
+\begin{lstlisting}
+# Terminál 1: server na http://127.0.0.1:8000
+cd backend
+.venv\Scripts\uvicorn main:app --reload
+
+# Terminál 2: klient (adresu vypíše Vite, zvyčajne http://localhost:5173)
+npm run dev
+\end{lstlisting}
+
+Vývojový server Vite presmeruje požiadavky na cestu \code{/api} na server
+na porte 8000 (nastavenie v \code{vite.config.js}). Databáza
+\code{backend/sessions.sqlite3} sa vytvorí automaticky pri prvom spustení.
+Produkčná zostava klienta sa vytvorí príkazom \code{npm run build}
+do priečinka \code{dist/}.
+
+% ----- Postup pre účastníka -----
+\subsection{Postup pre účastníka}
+
+% Číslovaný zoznam.
+\begin{enumerate}
+  \item Na úvodnej obrazovke zadajte meno a priezvisko, vyberte zariadenie
+        a klávesnicu a zaškrtnite súhlas. Tlačidlo „Začať meranie“ sa
+        aktivuje až po vyplnení mena a súhlasu.
+  \item Napíšte zobrazenú vetu rovnako, ako bežne píšete, a potvrďte ju
+        klávesom Enter. Pokus s nesprávnym textom alebo neuvoľnenou klávesou
+        sa nezapočíta.
+  \item Po 15 správnych pokusoch sa zobrazí súhrn (počet pokusov, priemerná
+        doba držania klávesy a priemerný čas napísania vety).
+  \item Tlačidlom „Odoslať na server“ sa relácia uloží do databázy.
+        Opakované odoslanie tej istej relácie sa nezapíše znova.
+\end{enumerate}
+
+% ----- Identifikácia pokusu -----
+\subsection{Identifikácia pokusu}
+
+Na úvodnej obrazovke tlačidlo „Rozpoznať pokus“ otvorí režim, v ktorom
+účastník napíše vetu jedenkrát. Server vráti troch najpodobnejších
+účastníkov s relatívnou mierou podobnosti, alebo označí pokus ako neznámy.
+Režim vyžaduje, aby v databáze existovali relácie s dostatočným počtom
+platných pokusov.
+
+Výsledok identifikácie na skutočných dátach ukazuje Obr.~\ref{fig:identify}: pokus napísal účastník, ktorého šablóna je v databáze, a server ho
+priradil správne. Okrem najpodobnejšieho účastníka zobrazí aplikácia aj
+ďalších dvoch kandidátov. Percentá udávajú len relatívne poradie medzi
+troma najbližšími šablónami, nie pravdepodobnosť zhody.
+
+% Obrázok (obrázok zo súboru figures/ui-identify.png): Identifikácia pokusu na skutočných dátach: najpodobnejší účastník a relatívna miera podobnosti troch najlepších kandidátov.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{ui-identify.png}
+  \caption{Identifikácia pokusu na skutočných dátach: najpodobnejší účastník
+           a relatívna miera podobnosti troch najlepších kandidátov.}
+  \label{fig:identify}
+\end{figure}
+
+% ----- Demonštračné video -----
+\subsection{Demonštračné video}
+\label{sec:video}
+
+K riešeniu patrí krátke demonštračné video
+(\code{video/rytmus-pisania-45s.mp4}, 45 sekúnd, Full HD, so slovenským
+komentárom). Ukazuje zber rytmu písania, rozdiely medzi tromi účastníkmi,
+tvorbu šablón z prvých desiatich pokusov a identifikáciu jedného nového
+pokusu. Rytmy účastníkov a výsledky v ňom (úspešnosť top-1 78,8\,\% a top-3
+97,0\,\%, identifikácia s mierami podobnosti 65,4; 19,0 a 15,7\,\%) pochádzajú
+zo zozbieraných dát a z koncového bodu \code{/api/evaluation}, nie sú
+vymyslené. Video je určené na prezentáciu práce; na reprodukciu výsledkov
+slúži postup v podkapitole~\ref{sec:prirucka-repro}.
+
+% ----- Práca s API -----
+\subsection{Práca s API}
+
+% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
+\begin{lstlisting}
+# kontrola, že server beží
+curl http://127.0.0.1:8000/api/health
+
+# počet relácií a udalostí
+curl http://127.0.0.1:8000/api/stats
+
+# zoznam posledných 10 relácií
+curl "http://127.0.0.1:8000/api/sessions?limit=10"
+
+# vyhodnotenie úspešnosti (trvá niekoľko sekúnd)
+curl http://127.0.0.1:8000/api/evaluation
+\end{lstlisting}
+
+% ----- Reprodukovateľnosť -----
+\subsection{Reprodukovateľnosť}
+\label{sec:prirucka-repro}
+
+Verzie závislostí klienta zaisťuje súbor \code{package-lock.json}.
+Databáza so zozbieranými dátami obsahuje osobné údaje, preto sa
+nemá verzionovať; na reprodukciu vyhodnotenia je potrebné zozbierať nové dáta
+(minimálne 10 pokusov na účastníka na tvorbu šablóny a 1 až 5 pokusov
+na testovanie).
+
+% ----- Riešenie problémov -----
+\subsection{Riešenie problémov}
+
+% Tabuľka: Časté problémy pri spustení a ich riešenie.
+\begin{table}[ht]
+  \centering
+  \small
+  \caption{Časté problémy pri spustení a ich riešenie.}
+  \label{tab:problemy}
+  \begin{tabularx}{\textwidth}{|Y|Y|}
+    \hline
+    \rowcolor[gray]{0.9} \textbf{Príznak} & \textbf{Príčina a riešenie} \\
+    \hline
+    \code{WinError 10013} pri spustení servera &
+      Port 8000 používa iný program. Zastavte ho alebo spustite server na
+      inom porte (\code{uvicorn main:app --port 8001}). \\
+    \hline
+    Odpoveď \code{detail: Not Found} na \code{/api/...} &
+      Na danom porte beží iná aplikácia, nie server tohto projektu. Overte
+      \code{/api/health}; správna odpoveď obsahuje \code{status: ok}. \\
+    \hline
+    Aplikácia v prehliadači nevie odoslať dáta &
+      Vite presmeruje \code{/api} na adresu zo súboru \code{vite.config.js}
+      (predvolene \code{http://127.0.0.1:8000}). Ak server beží na inom porte,
+      upravte adresu v tomto súbore. \\
+    \hline
+    „Chyba servera“ po odoslaní &
+      Server nebeží alebo vrátil chybu; pozrite výpis servera. \\
+    \hline
+    Účastník chýba vo vyhodnotení &
+      Pokusy sú neplatné alebo má menej ako 11 pokusov. Skontrolujte relácie
+      cez \code{/api/sessions} a \code{/api/sessions/\{id\}}: platný pokus má
+      presne 74 udalostí. \\
+    \hline
+    Pokus sa po Enter vynuluje &
+      Text sa nezhoduje s vetou alebo nie sú uvoľnené všetky klávesy.
+      Napíšte vetu znova bez opráv. \\
+    \hline
+  \end{tabularx}
+\end{table}

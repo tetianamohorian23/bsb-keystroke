@@ -1,0 +1,25 @@
+% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
+\begin{lstlisting}
+bsb-keystroke/
+|-- index.html
+|-- package.json, package-lock.json, vite.config.js
+|-- src/
+|   |-- App.jsx                  prepinanie obrazoviek
+|   |-- constants.js             veta, pocet opakovani, ignorovane klavesy
+|   |-- data/keyboardLayout.js   rozlozenie klavesnice v pozadi
+|   |-- components/
+|   |   |-- setup/               uvodna obrazovka
+|   |   |-- run/                 meranie
+|   |   |-- identify/            rozpoznanie pokusu
+|   |   |-- done/                zaverecna obrazovka
+|   |   `-- typing/              spolocne casti karty s pisanim
+|   |-- hooks/                   useTypingAttempt, usePressedKeys
+|   |-- utils/                   api, csv, summary
+|   `-- styles/                  CSS rozdelene podla obrazovky
+|-- backend/
+|   |-- main.py                  API, sablony, identifikacia, vyhodnotenie
+|   |-- requirements.txt
+|   `-- README.md
+|-- docs/                        technicka dokumentacia (LaTeX)
+`-- video/rytmus-pisania-45s.mp4 demonstracne video (45 s)
+\end{lstlisting}

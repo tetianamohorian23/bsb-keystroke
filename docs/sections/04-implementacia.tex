@@ -1,0 +1,311 @@
+\section{Implementácia}
+\label{sec:impl}
+
+% ----- Použité technológie -----
+\subsection{Použité technológie}
+
+Použité technológie sú zhrnuté v Tab.~\ref{tab:tech}.
+
+% Tabuľka: Použité technológie.
+\begin{table}[ht]
+  \centering
+  \small
+  \caption{Použité technológie.}
+  \label{tab:tech}
+  \begin{tabularx}{\textwidth}{|l|Y|}
+    \hline
+    \rowcolor[gray]{0.9} \textbf{Časť} & \textbf{Technológia} \\
+    \hline
+    Klient & React, Vite, čisté CSS (bez knižnice komponentov) \\
+    \hline
+    Server & Python, FastAPI, Uvicorn \\
+    \hline
+    Spracovanie dát & pandas \\
+    \hline
+    Úložisko & SQLite (súbor \code{backend/sessions.sqlite3}) \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+% ----- Klientska aplikácia -----
+\subsection{Klientska aplikácia}
+
+Zdrojový kód klienta je v priečinku \code{src/}. Aplikácia je rozdelená na
+obrazovky, opakovane použiteľné komponenty, hooky a pomocné funkcie:
+
+% Odrážkový zoznam.
+\begin{itemize}
+  \item \code{App.jsx} riadi prechody medzi stavmi (\code{setup},
+        \code{run}, \code{identify}, \code{done}) a drží údaje relácie,
+  \item \code{components/} obsahuje obrazovky (\code{setup}, \code{run},
+        \code{identify}, \code{done}) a spoločné časti karty s písaním
+        (\code{typing}): zobrazenie vety, vstupné pole, hlavičku a graf
+        rytmu,
+  \item \code{hooks/useTypingAttempt.js} zaznamenáva udalosti jedného
+        pokusu a používajú ho obrazovky merania aj identifikácie,
+  \item \code{hooks/usePressedKeys.js} sleduje stlačené klávesy na
+        zvýraznenie klávesnice v pozadí,
+  \item \code{utils/} obsahuje volania API, export do CSV a výpočet súhrnu,
+  \item \code{styles/} obsahuje štýly rozdelené podľa obrazovky.
+\end{itemize}
+
+Hook \code{useTypingAttempt} registruje poslucháčov \code{keydown} a
+\code{keyup} priamo na vstupnom poli. Pri stlačení uloží udalosť
+a vytvorí úsečku grafu rytmu, pri uvoľnení doplní jej koniec. Po stlačení
+klávesu Enter zavolá funkciu, ktorú mu odovzdala obrazovka (pokus
+sa overí a buď zapíše, alebo zamietne). Údaje o pokusoch sa
+držia v referenciách, aby zápis udalostí nespôsoboval zbytočné
+prekresľovanie; stav (\code{useState}) sa mení len pre text a úsečky grafu.
+
+Počas merania sa v reálnom čase kreslí graf rytmu na plátno
+\code{canvas} (Obr.~\ref{fig:run}): oranžové úsečky patria aktuálnemu
+pokusu a zlaté predchádzajúcemu. Pozadie tvorí stylizovaná klávesnica, ktorá
+zvýrazňuje práve stlačené klávesy a nemá vplyv na meranie.
+Obrazovka prípravy relácie je na Obr.~\ref{fig:setup}.
+
+% Obrázok (obrázok zo súboru figures/ui-setup.png): Obrazovka prípravy relácie.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{ui-setup.png}
+  \caption{Obrazovka prípravy relácie.}
+  \label{fig:setup}
+\end{figure}
+
+% Obrázok (obrázok zo súboru figures/ui-run.png): Obrazovka merania: veta, vstupné pole a graf rytmu.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{ui-run.png}
+  \caption{Obrazovka merania: veta, vstupné pole a graf rytmu.}
+  \label{fig:run}
+\end{figure}
+
+% ----- Serverová časť -----
+\subsection{Serverová časť}
+
+Server (\code{backend/main.py}) poskytuje rozhranie REST uvedené v
+Tab.~\ref{tab:api}. Dokumentácia vo formáte OpenAPI je dostupná na
+adrese \code{/docs}.
+
+% Tabuľka: Koncové body API.
+\begin{table}[ht]
+  \centering
+  \small
+  \caption{Koncové body API.}
+  \label{tab:api}
+  \begin{tabularx}{\textwidth}{|l|l|Y|}
+    \hline
+    \rowcolor[gray]{0.9} \textbf{Metóda} & \textbf{Cesta} & \textbf{Popis} \\
+    \hline
+    GET  & \code{/api/health} & kontrola dostupnosti \\
+    \hline
+    POST & \code{/api/sessions} & uloženie dokončenej relácie \\
+    \hline
+    GET  & \code{/api/sessions} & zoznam relácií bez udalostí (\code{limit}, \code{offset}) \\
+    \hline
+    GET  & \code{/api/sessions/\{id\}} & metadáta a všetky udalosti jednej relácie \\
+    \hline
+    GET  & \code{/api/stats} & počet relácií a udalostí \\
+    \hline
+    POST & \code{/api/identify} & identifikácia jedného pokusu \\
+    \hline
+    GET  & \code{/api/evaluation} & vyhodnotenie na pokusoch 11--15 \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+Relácie sa ukladajú do tabuľky \code{sessions} so stĺpcami \code{id},
+\code{participant\_id}, \code{session\_id}, \code{meta\_json},
+\code{rows\_json} a \code{created\_at}. Udalosti celej relácie sú uložené
+ako jeden JSON dokument. Uloženie je idempotentné: ak už existuje relácia
+s rovnakým \code{session\_id}, server nič nezapíše a vráti stav
+\code{already\_saved}. Pri chýbajúcom \code{participant\_id},
+\code{session\_id} alebo prázdnom zozname udalostí vráti chybu 422.
+
+Šablóny sa pri každej požiadavke na identifikáciu alebo vyhodnotenie
+počítajú nanovo zo všetkých uložených relácií. Pre malý počet účastníkov
+je to postačujúce a zjednodušuje to konzistenciu (nie je potrebné
+šablóny pri pribudnutí nových dát invalidovať), pri väčšom objeme dát by
+bolo vhodné šablóny ukladať.
+
+% ----- Známe obmedzenia implementácie -----
+\subsection{Známe obmedzenia implementácie}
+\label{sec:obmedzenia}
+
+Pri analýze kódu sa zistili tieto obmedzenia, ktoré treba brať do úvahy
+pri interpretácii výsledkov:
+% Odrážkový zoznam.
+\begin{itemize}
+  \item Klient nerozpoznáva stlačenie Backspace ani Delete ako chybu.
+        Pokus s opravou, ktorý skončí správnym textom, klient prijme, no
+        server ho pri tvorbe šablón ignoruje, pretože má viac ako 37
+        stlačení.
+  \item Pôvodná verzia endpointu \code{/api/evaluation} zoskupovala pokusy
+        podľa dvojice (účastník, číslo pokusu) cez všetky relácie. Ak mal
+        účastník viac relácií, udalosti rovnakého čísla pokusu sa zlúčili,
+        pokus mal viac ako 37 stlačení a z vyhodnotenia vypadol. Chyba sa
+        prejavila pri analýze zozbieraných dát (jeden účastník so štyrmi
+        reláciami nemal v hodnotení žiadny pokus) a bola opravená:
+        pokusy sa teraz zoskupujú podľa trojice (účastník, relácia,
+        číslo pokusu).
+  \item Pri troch a menej účastníkoch je metrika top-3 triviálne rovná
+        100\,\%, keďže zoznam obsahuje všetkých účastníkov.
+  \item Identifikátorom účastníka je zadané meno, takže databáza obsahuje
+        osobné údaje a nemá sa verzionovať ani zverejňovať.
+  \item Závislosti klienta sú v \code{package.json} uvedené ako
+        \code{latest}; reprodukovateľnosť zaisťuje súbor
+        \code{package-lock.json}, v \code{requirements.txt} sú uvedené
+        len dolné hranice verzií.
+\end{itemize}
+
+% ----- Overenie pokusu na klientovi -----
+\subsection{Overenie pokusu na klientovi}
+
+Priebeh overenia jedného pokusu po stlačení klávesu Enter ukazuje
+Obr.~\ref{fig:overenie}.
+
+% Obrázok (schéma nakreslená v TikZ): Overenie pokusu po stlačení klávesu Enter.
+\begin{figure}[ht]
+  \centering
+  \begin{tikzpicture}[
+      node distance=0.9cm and 1.6cm, >=Stealth,
+      step/.style={draw, rounded corners, minimum width=4.4cm, minimum height=0.9cm, align=center},
+      test/.style={draw, diamond, aspect=2.6, inner sep=1pt, align=center, font=\small},
+      bad/.style={draw, rounded corners, minimum width=3.2cm, minimum height=0.9cm, align=center, fill=red!10, font=\small}]
+    \node[step] (enter) {Enter};
+    \node[test, below=of enter] (t1) {text = veta?};
+    \node[test, below=of t1] (t2) {počet stlačení\\= počet uvoľnení?};
+    \node[step, below=of t2] (ok) {pokus sa započíta};
+    \node[bad, right=of t1] (b1) {zamietnuť: text\\sa nezhoduje};
+    \node[bad, right=of t2] (b2) {zamietnuť: klávesy\\neuvoľnené};
+    \draw[->] (enter) -- (t1);
+    \draw[->] (t1) -- node[left, font=\small] {áno} (t2);
+    \draw[->] (t2) -- node[left, font=\small] {áno} (ok);
+    \draw[->] (t1) -- node[above, font=\small] {nie} (b1);
+    \draw[->] (t2) -- node[above, font=\small] {nie} (b2);
+  \end{tikzpicture}
+  \caption{Overenie pokusu po stlačení klávesu Enter.}
+  \label{fig:overenie}
+\end{figure}
+
+Zamietnutý pokus sa nezapíše, pole sa vyprázdni a zobrazí sa chybová
+správa. V režime identifikácie sa navyše vyžaduje presne 37 stlačení.
+Vyššie opísané obmedzenie týkajúce sa Backspace (podkapitola~\ref{sec:obmedzenia})
+znamená, že pokus s opravou klient prijme, ak výsledný text je správny, no
+server ho neskôr ignoruje.
+
+% ----- Ukážky kľúčového kódu -----
+\subsection{Ukážky kľúčového kódu}
+
+Výpočet vektora príznakov z jedného pokusu (\code{backend/main.py}, skrátené):
+
+% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
+\begin{lstlisting}[language=Python]
+# 1. Udalosti pokusu zoradíme a rozdelíme na stlačenia a uvoľnenia
+frame = pd.DataFrame(rows).sort_values("seq")
+downs = frame[frame["event"] == "down"]
+ups = frame[frame["event"] == "up"]
+
+# 2. Platný pokus má presne 37 stlačení a 37 uvoľnení
+if len(downs) != KEY_COUNT or len(ups) != KEY_COUNT:
+    raise ValueError("an attempt must contain exactly 37 key presses and releases")
+...
+
+# 3. Doba držania = čas uvoľnenia mínus čas stlačenia tej istej klávesy
+holds = []
+for _, down in downs.iterrows():
+    matching = ups[(ups["code"] == down["code"]) & (ups["seq"] > down["seq"])]
+    holds.append(float(matching.iloc[0]["t_ms"]) - float(down["t_ms"]))
+
+# 4. Interval = rozdiel časov dvoch po sebe idúcich stlačení
+intervals = [down_times[i] - down_times[i - 1] for i in range(1, len(down_times))]
+
+# 5. Vektor príznakov: 37 dôb držania + 36 intervalov = 73 hodnôt
+return holds + intervals
+\end{lstlisting}
+
+Šablóna účastníka a vzdialenosť nového pokusu od nej:
+
+% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
+\begin{lstlisting}[language=Python]
+# Každý riadok matice je jeden platný pokus (73 príznakov)
+matrix = pd.DataFrame(vectors)
+
+# Šablóna účastníka: priemer a smerodajná odchýlka každého príznaku
+mean = matrix.mean().tolist()
+std = matrix.std(ddof=0).replace(0, 1).tolist()   # nulová odchýlka -> 1
+...
+
+# Vzdialenosť nového pokusu od šablóny (štandardizovaná euklidovská)
+distance = sqrt(sum(((v - c) / s) ** 2 for v, c, s in zip(vector, mean, std)))
+...
+
+# Neznámy pokus: priemerná odchýlka na jeden príznak je väčšia ako 3
+unknown = best_distance / sqrt(len(vector)) > 3
+\end{lstlisting}
+
+% ----- Príklady požiadaviek a odpovedí API -----
+\subsection{Príklady požiadaviek a odpovedí API}
+
+Uloženie relácie (skrátené; \code{rows} obsahuje všetky udalosti
+všetkých pokusov):
+
+% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
+\begin{lstlisting}
+# Požiadavka: uloženie relácie (skrátené)
+POST /api/sessions
+{"meta": {"participant_id": "P1", "session_id": "2026-10-01T10:00:00.000Z",
+          "device": "Notebook", "keyboard": "Vstavana"},
+ "rows": [{"participant_id": "P1", "session_id": "...", "rep": 1, "seq": 0,
+           "event": "down", "code": "KeyE", "key": "E", "t_ms": "0.00"}, ...]}
+
+# Odpovede
+201  {"id": 1, "status": "saved"}              # nová relácia
+201  {"id": 1, "status": "already_saved"}      # rovnaké session_id, nič sa nezapíše
+422  {"detail": "meta.participant_id, meta.session_id and rows are required"}
+\end{lstlisting}
+
+Identifikácia jedného pokusu (37 stlačení a uvoľnení):
+
+% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
+\begin{lstlisting}
+# Požiadavka: identifikácia jedného pokusu (37 stlačení a uvoľnení)
+POST /api/identify
+{"rows": [{"seq": 0, "event": "down", "code": "KeyE", "key": "E", "t_ms": "0.00"}, ...]}
+
+# Odpoveď: najpodobnejší účastník a tri najlepšie zhody
+200  {"name": "P2", "unknown": false,
+      "matches": [{"name": "P2", "percent": 44.7, "distance": 3.1},
+                  {"name": "P1", "percent": 34.3, "distance": 4.0},
+                  {"name": "P3", "percent": 21.1, "distance": 6.6}]}
+
+# Odpoveď: rytmus nepatrí nikomu z účastníkov
+200  {"name": null, "unknown": true, "matches": [...]}
+
+# Chyby
+422  {"detail": "an attempt must contain exactly 37 key presses and releases"}
+422  {"detail": "No valid participant templates are available"}
+\end{lstlisting}
+
+Hodnoty \code{distance} v ukážke sú ilustračné. Vyhodnotenie:
+
+% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
+\begin{lstlisting}
+# Vyhodnotenie na pokusoch 11-15 (ukážkové čísla)
+GET /api/evaluation
+
+200  {"top1": 100.0, "top3": 100.0, "total": 15,
+      "confusion": {"P1": {"P1": 5}, "P2": {"P2": 5}, "P3": {"P3": 5}}}
+\end{lstlisting}
+
+% ----- Výkon -----
+\subsection{Výkon}
+
+Šablóny sa pri každej požiadavke počítajú nanovo zo všetkých relácií.
+Pôvodná verzia vyhodnotenia navyše volala identifikáciu pre každý
+testovací pokus, takže sa databáza načítala a šablóny prepočítali pri
+každom z nich: čas rástol súčinom (testovacie pokusy $\times$ objem dát)
+a pri ôsmich reláciách (8\,946 udalostí) trvala jedna požiadavka na
+\code{/api/evaluation} približne 90 sekúnd. Vyhodnotenie preto teraz
+vypočíta šablóny raz a použije ich pre všetky testovacie pokusy; výsledky sa
+tým nemenia. Pri identifikácii jedného pokusu sa šablóny stále počítajú pri
+každej požiadavke, čo je pre desiatky účastníkov prijateľné.

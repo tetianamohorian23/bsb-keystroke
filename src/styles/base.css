@@ -25,8 +25,9 @@ body,
 }
 
 body {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
   background:
     radial-gradient(900px 600px at 5% 0%, #29201b 0%, transparent 62%),
     radial-gradient(850px 550px at 100% 100%, #191e1b 0%, transparent 66%),
@@ -42,8 +43,7 @@ main {
 }
 
 main:not(.running) {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
 /* Kompaktné rozloženie počas merania, aby ostala viditeľná klávesnica. */
