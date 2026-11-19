@@ -1,27 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { IGNORED_KEYS } from "../constants";
+import { CORRECTION_KEYS, IGNORED_KEYS } from "../constants";
 
 /**
  * Zaznamenáva časy stlačenia a uvoľnenia kláves jedného pokusu písania.
- * `onEnter` sa zavolá po stlačení Enter; vždy sa použije jeho najnovšia verzia.
+ * `onEnter` sa zavolá po stlačení Enter; `onMistake` po stlačení Backspace/Delete
+ * (kláves sa nevykoná). Ak je zadaný `target`, nesprávny znak tiež zavolá `onMistake`. Vždy sa použije najnovšia verzia callbackov.
  */
-export function useTypingAttempt({ onEnter }) {
+export function useTypingAttempt({ target, onEnter, onMistake }) {
   const inputRef = useRef(null);
   const [text, setText] = useState("");
   const [bars, setBars] = useState([]);
 
   const events = useRef([]);
   const liveBars = useRef([]);
-  const dirty = useRef(false);
   const t0 = useRef(null);
 
   const onEnterRef = useRef(onEnter);
   onEnterRef.current = onEnter;
+  const onMistakeRef = useRef(onMistake);
+  onMistakeRef.current = onMistake;
 
   const reset = useCallback(() => {
     events.current = [];
     liveBars.current = [];
-    dirty.current = false;
     t0.current = null;
     setText("");
     setBars([]);
@@ -41,6 +42,11 @@ export function useTypingAttempt({ onEnter }) {
         onEnterRef.current();
         return;
       }
+      if (CORRECTION_KEYS.has(e.code)) {
+        e.preventDefault();
+        onMistakeRef.current?.();
+        return;
+      }
       if (IGNORED_KEYS.has(e.code)) {
         e.preventDefault();
         return;
@@ -55,7 +61,7 @@ export function useTypingAttempt({ onEnter }) {
     };
 
     const onKeyUp = (e) => {
-      if (IGNORED_KEYS.has(e.code)) {
+      if (IGNORED_KEYS.has(e.code) || CORRECTION_KEYS.has(e.code)) {
         e.preventDefault();
         return;
       }
@@ -94,9 +100,15 @@ export function useTypingAttempt({ onEnter }) {
   return {
     inputRef,
     text,
-    setText,
+    // Nesprávny znak (text nie je začiatkom cieľového textu) ihneď zruší pokus.
+    setText: (value) => {
+      if (target && !target.startsWith(value)) {
+        onMistakeRef.current?.();
+        return;
+      }
+      setText(value);
+    },
     bars,
-    dirty,
     reset,
     getEventRows,
     getBars: () => liveBars.current,

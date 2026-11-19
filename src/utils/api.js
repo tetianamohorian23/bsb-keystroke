@@ -6,8 +6,8 @@ function postJson(url, body) {
   });
 }
 
-export async function identifyAttempt(rows) {
-  const response = await postJson("/api/identify", { rows });
+export async function identifyAttempt(rows, mode) {
+  const response = await postJson("/api/identify", { rows, mode });
   const result = await response.json();
   if (!response.ok) {
     throw new Error(result.detail || "Nepodarilo sa rozpoznať pokus");
@@ -19,4 +19,10 @@ export async function identifyAttempt(rows) {
 export async function saveSession(meta, rows) {
   const response = await postJson("/api/sessions", { meta, rows });
   return { ok: response.ok, result: response.ok ? await response.json() : null };
+}
+
+export async function fetchComparison() {
+  const response = await fetch("/api/compare");
+  if (!response.ok) throw new Error("Nepodarilo sa načítať porovnanie");
+  return response.json();
 }

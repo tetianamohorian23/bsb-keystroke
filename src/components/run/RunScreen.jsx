@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { EMPTY_MESSAGE, PHRASE, REPS } from "../../constants";
+import { EMPTY_MESSAGE, MODES, REPS } from "../../constants";
 import { useTypingAttempt } from "../../hooks/useTypingAttempt";
 import { summarizeAttempts } from "../../utils/summary";
 import PhraseDisplay from "../typing/PhraseDisplay";
@@ -8,13 +8,18 @@ import TypingHeader from "../typing/TypingHeader";
 import TypingInput from "../typing/TypingInput";
 
 export default function RunScreen({ meta, onComplete }) {
+  const mode = MODES[meta.mode];
   const [rep, setRep] = useState(0);
   const [message, setMessage] = useState(EMPTY_MESSAGE);
   const [ghost, setGhost] = useState([]);
   const rows = useRef([]);
   const attemptsBars = useRef([]);
 
-  const attempt = useTypingAttempt({ onEnter: finish });
+  const attempt = useTypingAttempt({
+    target: mode.text,
+    onEnter: finish,
+    onMistake: () => reject("Chyba, začnite znova."),
+  });
 
   function reject(text) {
     setMessage({ text, kind: "bad" });
@@ -26,11 +31,8 @@ export default function RunScreen({ meta, onComplete }) {
     const downs = eventRows.filter((row) => row.event === "down").length;
     const ups = eventRows.length - downs;
 
-    if (attempt.text !== PHRASE) {
-      return reject("Text sa nezhoduje s vetou. Skúste znova.");
-    }
-    if (attempt.dirty.current) {
-      return reject("Použili ste Backspace alebo Delete. Napíšte znova bez opráv.");
+    if (attempt.text !== mode.text) {
+      return reject(`Text sa nezhoduje so zadaným textom. Napíšte ${mode.noun} znova.`);
     }
     if (downs !== ups) {
       return reject("Nie všetky klávesy boli uvoľnené. Skúste znova.");
@@ -64,11 +66,11 @@ export default function RunScreen({ meta, onComplete }) {
             {String(rep).padStart(2, "0")} <small>/ {REPS}</small>
           </>
         }
-        label="VETA NA ODPÍSANIE"
+        label={mode.header}
         title="Udržte prirodzený rytmus."
       />
-      <PhraseDisplay typed={attempt.text} />
-      <TypingInput attempt={attempt} ariaLabel="Pole na písanie vety" />
+      <PhraseDisplay text={mode.text} typed={attempt.text} />
+      <TypingInput attempt={attempt} ariaLabel="Pole na písanie" />
       <RhythmCanvas bars={attempt.bars} ghost={ghost} />
       <div className="progress-meta">
         <span>POSTUP MERANIA</span>

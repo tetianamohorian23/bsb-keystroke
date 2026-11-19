@@ -1,13 +1,13 @@
 import SetupCard from "./SetupCard";
 
-export default function SetupScreen({ setup, onChange, onStart, onIdentify }) {
+export default function SetupScreen({ setup, onChange, onStart, onIdentify, onCompare }) {
   return (
     <div className="setup-layout">
       <section className="intro">
         <h1>Každý píše vlastným rytmom</h1>
         <p className="lead">
           Projekt o biometrickej autentifikácii. Niekoľkokrát napíšete tú istú
-          vetu a my zaznamenávame časy stlačenia kláves spolu s vaším menom.
+          vetu alebo slovo a my zaznamenávame časy stlačenia kláves spolu s vaším menom.
         </p>
         <div className="metric-chips">
           <span>
@@ -26,6 +26,7 @@ export default function SetupScreen({ setup, onChange, onStart, onIdentify }) {
         onChange={onChange}
         onStart={onStart}
         onIdentify={onIdentify}
+        onCompare={onCompare}
       />
     </div>
   );

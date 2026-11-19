@@ -1,23 +1,29 @@
 import { useState } from "react";
+import { DEFAULT_MODE } from "./constants";
+import CompareScreen from "./components/compare/CompareScreen";
 import DoneScreen from "./components/done/DoneScreen";
 import IdentifyScreen from "./components/identify/IdentifyScreen";
 import KeyboardBackground from "./components/KeyboardBackground";
 import RunScreen from "./components/run/RunScreen";
 import SetupScreen from "./components/setup/SetupScreen";
 import { usePressedKeys } from "./hooks/usePressedKeys";
+import { useRandomKeys } from "./hooks/useRandomKeys";
 
 const INITIAL_SETUP = {
   id: "",
   device: "Notebook",
   keyboard: "Vstavaná",
+  mode: DEFAULT_MODE,
   consent: false,
 };
 
 export default function App() {
-  const [phase, setPhase] = useState("setup"); // setup | run | identify | done
+  const [phase, setPhase] = useState("setup"); // setup | run | identify | compare | done
   const [setup, setSetup] = useState(INITIAL_SETUP);
   const [session, setSession] = useState(null); // { meta, rows, summary }
-  const pressed = usePressedKeys(phase === "run" || phase === "identify");
+  const typedKeys = usePressedKeys(phase === "run" || phase === "identify");
+  const demoKeys = useRandomKeys(phase === "setup");
+  const pressed = phase === "setup" ? demoKeys : typedKeys;
 
   const startRun = () => {
     setSession({
@@ -26,6 +32,7 @@ export default function App() {
         session_id: new Date().toISOString(),
         device: setup.device,
         keyboard: setup.keyboard,
+        mode: setup.mode,
       },
     });
     setPhase("run");
@@ -48,12 +55,16 @@ export default function App() {
             onChange={setSetup}
             onStart={startRun}
             onIdentify={() => setPhase("identify")}
+            onCompare={() => setPhase("compare")}
           />
         )}
         {phase === "run" && (
           <RunScreen meta={session.meta} onComplete={completeRun} />
         )}
-        {phase === "identify" && <IdentifyScreen onBack={backToSetup} />}
+        {phase === "identify" && (
+          <IdentifyScreen mode={setup.mode} onBack={backToSetup} />
+        )}
+        {phase === "compare" && <CompareScreen onBack={backToSetup} />}
         {phase === "done" && <DoneScreen {...session} onBack={backToSetup} />}
       </main>
     </>

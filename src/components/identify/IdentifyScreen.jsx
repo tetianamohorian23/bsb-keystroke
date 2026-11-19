@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { EMPTY_MESSAGE, PHRASE } from "../../constants";
+import { EMPTY_MESSAGE, MODES } from "../../constants";
 import { useTypingAttempt } from "../../hooks/useTypingAttempt";
 import { identifyAttempt } from "../../utils/api";
 import PhraseDisplay from "../typing/PhraseDisplay";
@@ -7,11 +7,12 @@ import TypingHeader from "../typing/TypingHeader";
 import TypingInput from "../typing/TypingInput";
 import IdentifyResults from "./IdentifyResults";
 
-export default function IdentifyScreen({ onBack }) {
+export default function IdentifyScreen({ mode: modeKey, onBack }) {
+  const mode = MODES[modeKey];
   const [result, setResult] = useState(null);
   const [message, setMessage] = useState(EMPTY_MESSAGE);
 
-  const attempt = useTypingAttempt({ onEnter: finish });
+  const attempt = useTypingAttempt({ target: mode.text, onEnter: finish, onMistake });
 
   function retry() {
     setResult(null);
@@ -20,13 +21,18 @@ export default function IdentifyScreen({ onBack }) {
     attempt.inputRef.current?.focus();
   }
 
+  function onMistake() {
+    setMessage({ text: "Chyba, začnite znova.", kind: "bad" });
+    attempt.reset();
+  }
+
   async function finish() {
     const eventRows = attempt.getEventRows();
     const downs = eventRows.filter((row) => row.event === "down").length;
 
-    if (attempt.text !== PHRASE || attempt.dirty.current || downs !== PHRASE.length) {
+    if (attempt.text !== mode.text || downs !== mode.text.length) {
       setMessage({
-        text: "Napíšte vetu bez opráv a uvoľnite všetky klávesy.",
+        text: `Napíšte ${mode.noun} presne a uvoľnite všetky klávesy.`,
         kind: "bad",
       });
       attempt.reset();
@@ -34,7 +40,7 @@ export default function IdentifyScreen({ onBack }) {
     }
 
     try {
-      setResult(await identifyAttempt(eventRows));
+      setResult(await identifyAttempt(eventRows, modeKey));
       setMessage(EMPTY_MESSAGE);
     } catch (error) {
       setMessage({ text: error.message, kind: "bad" });
@@ -50,10 +56,10 @@ export default function IdentifyScreen({ onBack }) {
             ROZPOZNÁVANIE <small>jeden pokus</small>
           </>
         }
-        label="VETA NA OVERENIE"
-        title="Napíšte vetu prirodzene."
+        label={`${mode.noun.toUpperCase()} NA OVERENIE`}
+        title="Píšte prirodzene."
       />
-      <PhraseDisplay typed={attempt.text} />
+      <PhraseDisplay text={mode.text} typed={attempt.text} />
       <TypingInput attempt={attempt} ariaLabel="Pole na rozpoznanie" />
       <div className="row">
         <p className={message.kind} role="status">
