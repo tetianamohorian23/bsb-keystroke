@@ -33,7 +33,12 @@ export const IGNORED_KEYS = new Set([
   "Escape",
 ]);
 
-export const DEVICES = ["Notebook", "Stolový počítač"];
-export const KEYBOARDS = ["Vstavaná", "Externá USB", "Externá Bluetooth"];
+// Opravné klávesy: zrušia aktuálny pokus a nikdy sa nevykonajú.
+export const CORRECTION_KEYS = new Set(["Backspace", "Delete"]);
+
+export const DESKTOP = "Stolový počítač";
+export const DEVICES = ["Notebook", DESKTOP];
+export const BUILT_IN_KEYBOARD = "Vstavaná";
+export const KEYBOARDS = [BUILT_IN_KEYBOARD, "Externá USB", "Externá Bluetooth"];
 
 export const EMPTY_MESSAGE = { text: "", kind: "" };

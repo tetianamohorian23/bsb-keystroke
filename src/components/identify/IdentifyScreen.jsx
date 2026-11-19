@@ -12,7 +12,7 @@ export default function IdentifyScreen({ mode: modeKey, onBack }) {
   const [result, setResult] = useState(null);
   const [message, setMessage] = useState(EMPTY_MESSAGE);
 
-  const attempt = useTypingAttempt({ onEnter: finish });
+  const attempt = useTypingAttempt({ target: mode.text, onEnter: finish, onMistake });
 
   function retry() {
     setResult(null);
@@ -21,13 +21,18 @@ export default function IdentifyScreen({ mode: modeKey, onBack }) {
     attempt.inputRef.current?.focus();
   }
 
+  function onMistake() {
+    setMessage({ text: "Chyba, začnite znova.", kind: "bad" });
+    attempt.reset();
+  }
+
   async function finish() {
     const eventRows = attempt.getEventRows();
     const downs = eventRows.filter((row) => row.event === "down").length;
 
-    if (attempt.text !== mode.text || attempt.dirty.current || downs !== mode.text.length) {
+    if (attempt.text !== mode.text || downs !== mode.text.length) {
       setMessage({
-        text: `Napíšte ${mode.noun} bez opráv a uvoľnite všetky klávesy.`,
+        text: `Napíšte ${mode.noun} presne a uvoľnite všetky klávesy.`,
         kind: "bad",
       });
       attempt.reset();

@@ -7,6 +7,7 @@ import KeyboardBackground from "./components/KeyboardBackground";
 import RunScreen from "./components/run/RunScreen";
 import SetupScreen from "./components/setup/SetupScreen";
 import { usePressedKeys } from "./hooks/usePressedKeys";
+import { useRandomKeys } from "./hooks/useRandomKeys";
 
 const INITIAL_SETUP = {
   id: "",
@@ -20,7 +21,9 @@ export default function App() {
   const [phase, setPhase] = useState("setup"); // setup | run | identify | compare | done
   const [setup, setSetup] = useState(INITIAL_SETUP);
   const [session, setSession] = useState(null); // { meta, rows, summary }
-  const pressed = usePressedKeys(phase === "run" || phase === "identify");
+  const typedKeys = usePressedKeys(phase === "run" || phase === "identify");
+  const demoKeys = useRandomKeys(phase === "setup");
+  const pressed = phase === "setup" ? demoKeys : typedKeys;
 
   const startRun = () => {
     setSession({

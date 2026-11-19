@@ -15,7 +15,11 @@ export default function RunScreen({ meta, onComplete }) {
   const rows = useRef([]);
   const attemptsBars = useRef([]);
 
-  const attempt = useTypingAttempt({ onEnter: finish });
+  const attempt = useTypingAttempt({
+    target: mode.text,
+    onEnter: finish,
+    onMistake: () => reject("Chyba, začnite znova."),
+  });
 
   function reject(text) {
     setMessage({ text, kind: "bad" });
@@ -29,9 +33,6 @@ export default function RunScreen({ meta, onComplete }) {
 
     if (attempt.text !== mode.text) {
       return reject(`Text sa nezhoduje so zadaným textom. Napíšte ${mode.noun} znova.`);
-    }
-    if (attempt.dirty.current) {
-      return reject("Použili ste Backspace alebo Delete. Napíšte znova bez opráv.");
     }
     if (downs !== ups) {
       return reject("Nie všetky klávesy boli uvoľnené. Skúste znova.");

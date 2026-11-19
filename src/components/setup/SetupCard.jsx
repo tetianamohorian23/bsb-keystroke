@@ -1,7 +1,21 @@
-import { DEVICES, KEYBOARDS, MODES } from "../../constants";
+import { BUILT_IN_KEYBOARD, DESKTOP, DEVICES, KEYBOARDS, MODES } from "../../constants";
 
 export default function SetupCard({ setup, onChange, onStart, onIdentify, onCompare }) {
   const set = (field) => (e) => onChange({ ...setup, [field]: e.target.value });
+
+  // Stolový počítač nemá vstavanú klávesnicu.
+  const keyboards = setup.device === DESKTOP
+    ? KEYBOARDS.filter((keyboard) => keyboard !== BUILT_IN_KEYBOARD)
+    : KEYBOARDS;
+
+  const setDevice = (e) => {
+    const device = e.target.value;
+    const keyboard =
+      device === DESKTOP && setup.keyboard === BUILT_IN_KEYBOARD
+        ? KEYBOARDS[1]
+        : setup.keyboard;
+    onChange({ ...setup, device, keyboard });
+  };
 
   return (
     <section className="card setup-card">
@@ -25,7 +39,7 @@ export default function SetupCard({ setup, onChange, onStart, onIdentify, onComp
           <label className="f" htmlFor="device">
             Zariadenie
           </label>
-          <select id="device" value={setup.device} onChange={set("device")}>
+          <select id="device" value={setup.device} onChange={setDevice}>
             {DEVICES.map((device) => (
               <option key={device}>{device}</option>
             ))}
@@ -36,7 +50,7 @@ export default function SetupCard({ setup, onChange, onStart, onIdentify, onComp
             Klávesnica
           </label>
           <select id="kbd" value={setup.keyboard} onChange={set("keyboard")}>
-            {KEYBOARDS.map((keyboard) => (
+            {keyboards.map((keyboard) => (
               <option key={keyboard}>{keyboard}</option>
             ))}
           </select>

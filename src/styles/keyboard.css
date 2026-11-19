@@ -36,6 +36,7 @@
   color: #82766c;
   font: 500 0.56rem "DM Mono", monospace;
   text-transform: uppercase;
+  transition: background 0.12s, box-shadow 0.12s, transform 0.12s;
 }
 
 .k.on {
