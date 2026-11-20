@@ -16,6 +16,13 @@ export const MODES = {
   },
 };
 export const DEFAULT_MODE = "phrase";
+
+// Frázy, ktoré sa dookola "píšu" na úvodnej obrazovke (len ukážka, nie zber dát).
+export const HOME_PHRASES = [
+  "Every keystroke tells a unique story.",
+  "Rytmus písania je ako odtlačok prsta.",
+  "Nepotrebujete heslo, stačí váš rytmus.",
+];
 export const REPS = 15;
 // Ako dlho zostane po chybe viditeľné vysvetlenie, kým sa pokus vynuluje.
 export const MISTAKE_MS = 1600;

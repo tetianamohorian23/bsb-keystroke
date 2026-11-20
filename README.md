@@ -63,6 +63,10 @@ pokusoch 11–15) a porovnanie režimov `GET /api/compare`. Všetky koncové bod
 v [`backend/README.md`](backend/README.md), interaktívna dokumentácia je na
 http://127.0.0.1:8000/docs.
 
+Analýzu FAR/FRR (overenie identity, kalibrácia prahu, grafy pre dokumentáciu) vytvorí
+`python far_frr.py` v priečinku `backend` (vo virtuálnom prostredí s `matplotlib`).
+Skript nič nemení a neukladá do databázy.
+
 ## Štruktúra projektu
 
 ```

@@ -30,7 +30,7 @@ a obsahuje algoritmus identifikácie. Komunikácia prebieha vo formáte JSON
 cez HTTP.
 
 % Obrázok (schéma nakreslená v TikZ): Architektúra systému.
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \vspace{1.5em}   % <- prázdny riadok (medzera) medzi textom hore a schémou; zmeňte číslo podľa potreby
   \begin{tikzpicture}[
@@ -112,7 +112,7 @@ uložené pred zavedením režimov nemajú v \code{meta} pole \code{mode}
 a považujú sa za reláciu s vetou (\code{phrase}).
 
 % Tabuľka: Polia záznamu o klávesovej udalosti.
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
   \caption{Polia záznamu o klávesovej udalosti.}
@@ -209,7 +209,7 @@ a slúžia len na vysvetlenie.
 Pokus obsahuje udalosti z Tab.~\ref{tab:priklad-udalosti}.
 
 % Tabuľka: Ilustračný pokus s tromi klávesmi (časy v ms).
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
   \caption{Ilustračný pokus s tromi klávesmi (časy v ms).}
@@ -309,3 +309,56 @@ oddeliť od rozdielu v zložení účastníkov. Server vracia aj výsledky na
 všetkých účastníkoch (\code{all}) ako doplnok, ale ten sa nepovažuje za
 spravodlivé porovnanie. Slovo má menej príznakov (19 oproti 73), preto sa
 očakáva nižšia presnosť, no kratší čas pokusu.
+
+% ----- Overenie identity a kalibrácia prahu -----
+\subsection{Overenie identity a kalibrácia prahu}
+\label{sec:overenie}
+
+Identifikácia (podkapitola~\ref{sec:protokol}) odpovedá na otázku „komu sa pokus
+najviac podobá?“. Pri \emph{overení identity} je otázka užšia: „je to naozaj ten
+človek, za ktorého sa vydáva?“. Pokus sa porovná len s jednou šablónou a buď
+prejde, alebo neprejde. Aplikácia overenie nemá. Táto podkapitola opisuje
+analýzu, ktorá na zozbieraných dátach ukazuje, ako dobre by rytmus písania na
+overenie stačil. Počíta ju skript \code{backend/far\_frr.py}; používa tie isté
+šablóny a príznaky ako server a nič v ňom nemení.
+
+\paragraph{Skóre.}
+Pre pokus $\mathbf{x}$ a šablónu $P$ použijeme rovnakú vzdialenosť
+$d(\mathbf{x}, P)$ ako vo vzorci~\eqref{eq:dist} a vydelíme ju číslom $\sqrt{m}$:
+\begin{equation}
+  \label{eq:score}
+  s(\mathbf{x}, P) = \frac{d(\mathbf{x}, P)}{\sqrt{m}}.
+\end{equation}
+Skóre je teda priemerná odchýlka na jeden príznak (je to tá istá veličina ako
+v podmienke~\eqref{eq:unknown}), vďaka čomu má prah rovnaký význam pre vetu
+(73 príznakov) aj pre slovo (19 príznakov). Pokus prejde, ak $s \le \tau$, kde
+$\tau$ je prah.
+
+\paragraph{Dve chyby.}
+Systém sa môže pomýliť dvoma spôsobmi. \emph{FAR} (\emph{false acceptance rate})
+je podiel cudzích pokusov, ktoré prejdú (pokus sa porovná so šablónou iného
+človeka). \emph{FRR} (\emph{false rejection rate}) je podiel vlastných pokusov,
+ktoré neprejdú:
+\begin{equation}
+  \label{eq:farfrr}
+  \mathrm{FAR}(\tau) = \frac{\left|\{\,s_i^{\mathrm{cudz}} \le \tau\,\}\right|}{N_{\mathrm{cudz}}},
+  \qquad
+  \mathrm{FRR}(\tau) = \frac{\left|\{\,s_i^{\mathrm{vlastn}} > \tau\,\}\right|}{N_{\mathrm{vlastn}}}.
+\end{equation}
+Vyšší prah znižuje FRR, ale zvyšuje FAR. Bod, v ktorom sa obe chyby rovnajú, sa
+volá \emph{EER} (\emph{equal error rate}).
+
+\paragraph{Ako sa vyberá prah.}
+Prah $\tau = 3$ z pravidla „neznámy používateľ“ sme zvolili odhadom a nikdy sme
+ho neoverili na dátach. Preto ho vyberieme z dát: z testovacích pokusov 11--13
+spočítame skóre vlastných a cudzích porovnaní a ako kalibrovaný prah $\tau^{*}$
+zoberieme hodnotu, pri ktorej sú FAR a FRR najbližšie (bod EER, zaokrúhlený
+nahor na dve desatinné miesta). Aby sme chyby nemerali na tých istých dátach,
+z ktorých prah vznikol, \textbf{pokusy 14 a 15 pri výbere nepoužijeme}. Slúžia
+až na vyhodnotenie, a to pri kalibrovanom aj pri pôvodnom prahu 3. Šablóny sa
+stále tvoria z pokusov 1--10. Kalibrácia sa robí len vtedy, keď máme aspoň 5
+vlastných a 5 cudzích porovnaní. Pravidlo „neznámy používateľ“ pri
+identifikácii zostáva pri prahu 3, aby sa výsledky identifikácie nezmenili.
+
+Analýza meria len chybovosť rozhodovania, nie bezpečnosť systému: aplikácia
+nijako nepreukazuje, že používateľ je tým, za koho sa vydáva.

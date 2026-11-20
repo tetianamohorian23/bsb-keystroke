@@ -54,48 +54,50 @@ do priečinka \code{dist/}.
 % ----- Postup pre účastníka -----
 \subsection{Postup pre účastníka}
 
-Aplikáciu otvorte na počítači alebo notebooku s fyzickou klávesnicou:
-na telefóne a tablete sa zobrazí hlásenie „Nie je podporované“.
+Aplikáciu treba otvoriť na počítači alebo notebooku s fyzickou klávesnicou.
+Na telefóne a tablete sa zobrazí len hlásenie „Nie je podporované“, pretože
+tam by sa časy kláves merali inak. Úvodnú obrazovku ukazuje
+Obr.~\ref{fig:setup}.
+
 \begin{enumerate}
   \item Na úvodnej obrazovke zadajte meno a priezvisko, vyberte zariadenie
-        a klávesnicu (pri stolovom počítači nie je ponuka „Vstavaná“),
+        a klávesnicu (pri stolovom počítači ponuka „Vstavaná“ nie je),
         v poli „Čo budete písať“ zvoľte vetu alebo slovo a zaškrtnite súhlas.
-        Tlačidlo „Začať meranie“ sa aktivuje až po vyplnení mena a súhlasu.
-  \item Napíšte zobrazený text rovnako, ako bežne píšete, a potvrďte ho
-        klávesom Enter. Backspace a Delete nefungujú: ich stlačenie aj
-        nesprávny znak pokus nezapočítajú: vstup sa na chvíľu zamkne,
-        zobrazený text sa zatrasie a hlásenie vysvetlí, čo sa stalo; potom
-        písanie začnete odznova a počítadlo sa nezvýši. Pokus
-        s neuvoľnenou klávesou sa nezapočíta.
-  \item Po 15 správnych pokusoch sa zobrazí súhrn (počet pokusov, priemerná
-        doba držania klávesy a priemerný čas napísania textu).
-  \item Relácia sa na server uloží automaticky, tlačidlo na odoslanie nie je
-        potrebné. Ak uloženie zlyhá, zobrazia sa tlačidlá „Skúsiť znova“
-        a „Stiahnuť CSV“. Opakované odoslanie tej istej relácie sa nezapíše
-        znova.
+        Tlačidlo „Začať meranie“ sa odomkne, až keď je vyplnené meno a súhlas.
+  \item Zobrazený text napíšte tak, ako píšete bežne, a potvrďte ho
+        klávesom Enter. Backspace a Delete nefungujú. Ak ich stlačíte alebo
+        napíšete nesprávny znak, pokus sa nezapočíta: vstup sa na chvíľu
+        zamkne, text sa zatrasie a hlásenie povie, čo sa stalo. Potom začnete
+        písať odznova a počítadlo sa nezvýši. Rovnako sa nezapočíta pokus,
+        pri ktorom ostala nejaká klávesa neuvoľnená.
+  \item Po 15 správnych pokusoch sa zobrazí súhrn: počet pokusov, priemerná
+        doba držania klávesy a priemerný čas napísania textu.
+  \item Reláciu aplikácia uloží na server sama, nič netreba odosielať. Ak
+        uloženie zlyhá, ponúkne tlačidlá „Skúsiť znova“ a „Stiahnuť CSV“.
+        Tú istú reláciu nie je možné zapísať dvakrát.
 \end{enumerate}
 
 % ----- Identifikácia pokusu -----
 \subsection{Identifikácia pokusu}
 
-Na úvodnej obrazovke tlačidlo „Rozpoznať pokus“ otvorí režim, v ktorom
-účastník napíše zvolený text (vetu alebo slovo, podľa režimu zvoleného na
-úvodnej obrazovke) jedenkrát. Server vráti troch najpodobnejších
-účastníkov s relatívnou mierou podobnosti, alebo označí pokus ako neznámy.
-Režim vyžaduje, aby v databáze existovali relácie s dostatočným počtom
+Tlačidlo „Rozpoznať pokus“ na úvodnej obrazovke otvorí režim, v ktorom
+človek napíše vybraný text (vetu alebo slovo) len raz. Server potom vráti
+troch najpodobnejších účastníkov s mierou podobnosti, alebo pokus označí ako
+neznámy. Aby to fungovalo, musia byť v databáze relácie s dostatočným počtom
 platných pokusov.
 
-Výsledok identifikácie na skutočných dátach ukazuje Obr.~\ref{fig:identify}: pokus napísal účastník, ktorého šablóna je v databáze, a server ho
-priradil správne. Okrem najpodobnejšieho účastníka zobrazí aplikácia aj
-ďalších dvoch kandidátov. Percentá udávajú len relatívne poradie medzi
-troma najbližšími šablónami, nie pravdepodobnosť zhody.
+Obr.~\ref{fig:identify} ukazuje výsledok na skutočných dátach: pokus napísal
+účastník, ktorého šablóna je v databáze, a server ho priradil správne.
+Aplikácia vypíše najpodobnejšieho účastníka a ešte dvoch ďalších kandidátov,
+každého s vodorovným pruhom podľa percenta (prvé miesto je oranžové, druhé
+zelené, tretie zlaté). Percentá sú len relatívne poradie medzi troma
+najbližšími šablónami, nie pravdepodobnosť zhody.
 
 % Obrázok (obrázok zo súboru figures/ui-identify.png): Identifikácia pokusu na skutočných dátach: najpodobnejší účastník a relatívna miera podobnosti troch najlepších kandidátov.
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{ui-identify.png}
-  \caption{Identifikácia pokusu na skutočných dátach: najpodobnejší účastník
-           a relatívna miera podobnosti troch najlepších kandidátov.}
+  \caption{Výsledok identifikácie s pruhmi podobnosti}
   \label{fig:identify}
 \end{figure}
 
@@ -103,8 +105,8 @@ troma najbližšími šablónami, nie pravdepodobnosť zhody.
 \subsection{Reprodukovateľnosť}
 \label{sec:prirucka-repro}
 
-Verzie závislostí klienta zaisťuje súbor \code{package-lock.json}.
-Databáza so zozbieranými dátami obsahuje osobné údaje, preto sa
-nemá verzionovať; na reprodukciu vyhodnotenia je potrebné zozbierať nové dáta
-(minimálne 10 pokusov na účastníka na tvorbu šablóny a 1 až 5 pokusov
-na testovanie).
+Verzie knižníc klienta pevne drží súbor \code{package-lock.json}.
+Databáza so zozbieranými dátami obsahuje osobné údaje, a preto sa nemá
+ukladať do repozitára. Kto chce vyhodnotenie zopakovať, musí zozbierať nové
+dáta, aspoň 10 pokusov na účastníka na šablónu a 1 až 5 pokusov na
+testovanie.

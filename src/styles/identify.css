@@ -9,16 +9,58 @@
 }
 
 .match {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(110px, 30%) 1fr 4.2rem;
+  align-items: center;
+  gap: 16px;
   padding: 10px 0;
   border-bottom: 1px solid var(--line);
   color: var(--muted);
 }
 
+.match.top .match-name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
 .match b {
   color: var(--gold);
   font-family: "DM Mono", monospace;
+  text-align: right;
+}
+
+/* Pruh podobnosti: šírka výplne = percento medzi tromi najbližšími šablónami. */
+.match-bar {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #1d2223;
+}
+
+.match-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  animation: bar-grow 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes bar-grow {
+  from {
+    width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .match-bar i {
+    animation: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .match {
+    grid-template-columns: minmax(84px, 36%) 1fr 3.6rem;
+    gap: 10px;
+  }
 }
 
 .identify-actions {
@@ -30,6 +72,13 @@
 
 .identify-actions button {
   margin-top: 0 !important;
+}
+
+/* Tlačidlo „Späť“: menšie a zarovnané doľava s textom nad ním. */
+.running .run-card .identify-actions button {
+  margin-left: 0;
+  padding: 13px 24px;
+  font-size: 1.05rem;
 }
 
 .running .identify-results h2 {

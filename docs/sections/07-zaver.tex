@@ -14,15 +14,19 @@ Na dátach piatich účastníkov dosiahol systém na 38 testovacích pokusoch
 a 60\,\%. Správne na prvom mieste bolo 30 pokusov z 38. Šesť z ôsmich chýb
 smeruje k jednému účastníkovi, ktorého šablóna má najširší rozptyl; pokus
 so spoločnou smerodajnou odchýlkou pre všetky šablóny zvýšil top-1 na 37
-z 38 pokusov (podkapitola~\ref{sec:test}).
+z 38 pokusov (podkapitola~\ref{sec:test}). Analýza FAR a FRR ukázala, že pôvodný
+prah 3 by pri overení identity prijal 35,9\,\% cudzích pokusov, kým kalibrovaný
+prah 2,13 znižuje túto chybu na 10,9\,\% za cenu vyššej chyby vlastných pokusov
+(FRR 18,8\,\% oproti 12,5\,\%, podkapitola~\ref{sec:kalibracia}).
 
 % ----- Obmedzenia riešenia -----
 Výsledky sú orientačné. Vzorka je malá a nerovnomerná: jeden účastník prispel
 20 pokusmi, iný len tromi. Všetky údaje vznikli na notebooku, preto sa nedá
 posúdiť vplyv zariadenia a vplyv klávesnice len veľmi obmedzene (štyri relácie
-z deviatich s vetou majú externú USB klávesnicu). Režim slova má zatiaľ dáta len od jedného účastníka, preto
-porovnanie vety a slova ešte nie je vyhodnotené. Prah pre označenie neznámeho pokusu je
-zvolený empiricky a nebol kalibrovaný na samostatných dátach. Šablóny sa
+z deviatich s vetou majú externú USB klávesnicu). Režim slova má zatiaľ dáta len od troch účastníkov, a to nerovnomerne rozložené, preto
+je porovnanie vety a slova len orientačné (Obr.~\ref{fig:porovnanie}). Prah pre označenie neznámeho pokusu je
+zvolený empiricky; kalibroval sa len v analýze overenia identity
+(podkapitola~\ref{sec:kalibracia}). Šablóny sa
 počítajú pri každej požiadavke nanovo, čo stačí pre malý súbor dát, no pre
 väčší by to bolo pomalé. Identifikátorom účastníka je meno, takže databáza
 obsahuje osobné údaje.
@@ -30,8 +34,8 @@ obsahuje osobné údaje.
 % ----- Smery ďalšieho vývoja -----
 Ďalej treba zozbierať dáta od viacerých účastníkov v niekoľkých reláciách, na
 rôznych zariadeniach a klávesniciach, a vyhodnotiť porovnanie vety a slova
-(zatiaľ chýba). Prah neznámeho pokusu sa má kalibrovať na samostatnej
+(zatiaľ je len orientačné). Prah neznámeho pokusu sa má kalibrovať na samostatnej
 validačnej množine, šablóny sa majú ukladať namiesto opakovaného výpočtu
 a namiesto mena sa má používať pseudonymný kód. Neskôr sa dá porovnať zvolená
-vzdialenosť s inými mierami a vyhodnotiť aj verifikácia, teda prijatie cudzieho
-a odmietnutie vlastného používateľa.
+vzdialenosť s inými mierami a overiť výsledky analýzy FAR a FRR na väčšom počte
+účastníkov.

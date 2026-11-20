@@ -7,7 +7,7 @@
 Použité technológie sú zhrnuté v Tab.~\ref{tab:tech}.
 
 % Tabuľka: Použité technológie.
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
   \caption{Použité technológie.}
@@ -48,9 +48,9 @@ obrazovky, opakovane použiteľné komponenty, hooky a pomocné funkcie:
         pokusu a používajú ho obrazovky merania aj identifikácie,
   \item \code{hooks/usePressedKeys.js} sleduje stlačené klávesy na
         zvýraznenie klávesnice v pozadí,
-  \item \code{hooks/useRandomKeys.js} na úvodnej obrazovke náhodne
-        „stláča“ klávesy pozadia ako ukážkovú animáciu (vypína sa pri
-        nastavení systému \emph{znížený pohyb}),
+  \item \code{hooks/useDemoTyping.js} na úvodnej obrazovke dookola „píše“
+        pripravené frázy a „stláča“ zodpovedajúce klávesy pozadia (pri
+        nastavení systému \emph{znížený pohyb} sa ukáže len prvá fráza),
   \item \code{utils/} obsahuje volania API, export do CSV, výpočet súhrnu,
         text hlásení o chybe (\code{mistake.js}) a zisťovanie dotykového
         zariadenia (\code{device.js}),
@@ -75,7 +75,7 @@ Počas merania sa v reálnom čase kreslí graf rytmu na plátno
 \code{canvas} (Obr.~\ref{fig:run}): oranžové úsečky patria aktuálnemu
 pokusu a zlaté predchádzajúcemu. Pozadie tvorí stylizovaná klávesnica, ktorá
 zvýrazňuje práve stlačené klávesy a nemá vplyv na meranie.
-Obrazovka prípravy relácie je na Obr.~\ref{fig:setup}.
+Úvodnú obrazovku s prípravou relácie ukazuje Obr.~\ref{fig:setup}: vľavo sa po jednej „píšu“ statické frázy a zvýrazňujú sa stláčané klávesy, vpravo je formulár na meno, zariadenie, klávesnicu, režim (veta alebo slovo) a súhlas.
 
 Dynamika písania sa meria len na fyzickej klávesnici. Dotykové klávesnice
 telefónov často posielajú udalosti s \code{key = "Unidentified"} a ich časy
@@ -87,19 +87,19 @@ Zariadenie sa rozpozná podľa \code{userAgentData.mobile}, reťazca
 „zobrazenie pre PC“ v prehliadači. Ide len o upozornenie, nie o bezpečnostnú
 ochranu. Úvodná obrazovka je na počítačoch pevná (bez posúvania stránky).
 
-% Obrázok (obrázok zo súboru figures/ui-setup.png): Obrazovka prípravy relácie.
-\begin{figure}[ht]
+% Obrázok (figures/ui-home.png): úvodná obrazovka a príprava relácie.
+\begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{ui-setup.png}
-  \caption{Obrazovka prípravy relácie.}
+  \includegraphics[width=\textwidth]{ui-home.png}
+  \caption{Úvodná obrazovka a príprava relácie}
   \label{fig:setup}
 \end{figure}
 
 % Obrázok (obrázok zo súboru figures/ui-run.png): Obrazovka merania: veta, vstupné pole a graf rytmu.
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{ui-run.png}
-  \caption{Obrazovka merania: veta, vstupné pole a graf rytmu.}
+  \caption{Obrazovka merania}
   \label{fig:run}
 \end{figure}
 
@@ -111,7 +111,7 @@ Tab.~\ref{tab:api}. Dokumentácia vo formáte OpenAPI je dostupná na
 adrese \code{/docs}.
 
 % Tabuľka: Koncové body API.
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
   \caption{Koncové body API.}
@@ -152,7 +152,7 @@ režimom; relácie bez poľa \code{mode} sa čítajú ako \code{phrase}.
 
 Po každom novo uloženom zázname server na pozadí (\code{BackgroundTasks})
 prekreslí súbor \code{accuracy\_chart.png} knižnicou matplotlib: stĺpcový graf
-top-1 a top-3 pre vetu a slovo, vypočítaný rovnako ako \code{/api/compare}.
+top-1 a top-3 pre vetu a slovo, vypočítaný rovnako ako \code{/api/compare} (ukážka je na Obr.~\ref{fig:porovnanie}).
 Odpoveď na uloženie sa tým nespomalí a zlyhanie kreslenia uloženie neovplyvní.
 
 % ----- Známe obmedzenia implementácie -----

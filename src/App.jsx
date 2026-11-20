@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { DEFAULT_MODE } from "./constants";
+import { DEFAULT_MODE, HOME_PHRASES } from "./constants";
 import DoneScreen from "./components/done/DoneScreen";
 import IdentifyScreen from "./components/identify/IdentifyScreen";
 import KeyboardBackground from "./components/KeyboardBackground";
 import RunScreen from "./components/run/RunScreen";
 import SetupScreen from "./components/setup/SetupScreen";
 import { usePressedKeys } from "./hooks/usePressedKeys";
-import { useRandomKeys } from "./hooks/useRandomKeys";
+import { useDemoTyping } from "./hooks/useDemoTyping";
 import { isTouchDevice } from "./utils/device";
 
 const INITIAL_SETUP = {
@@ -23,8 +23,8 @@ export default function App() {
   const [setup, setSetup] = useState(INITIAL_SETUP);
   const [session, setSession] = useState(null); // { meta, rows, summary }
   const typedKeys = usePressedKeys(phase === "run" || phase === "identify");
-  const demoKeys = useRandomKeys(phase === "setup");
-  const pressed = phase === "setup" ? demoKeys : typedKeys;
+  const demo = useDemoTyping(phase === "setup", HOME_PHRASES);
+  const pressed = phase === "setup" ? demo.pressed : typedKeys;
 
   const startRun = () => {
     setSession({
@@ -64,6 +64,7 @@ export default function App() {
       <main className={phase === "setup" ? "home" : phase === "done" ? "done" : "running"}>
         {phase === "setup" && (
           <SetupScreen
+            demoText={demo.text}
             setup={setup}
             onChange={setSetup}
             onStart={startRun}

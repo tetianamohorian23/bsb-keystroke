@@ -11,7 +11,7 @@ pripravenými odpoveďami, takže test overuje klienta, nie server.
 Výsledky sú v Tab.~\ref{tab:func}.
 
 % Tabuľka: Výsledky funkčného testu klienta.
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
   \caption{Výsledky funkčného testu klienta.}
@@ -60,12 +60,12 @@ Metóda identifikácie sa vyhodnocuje podľa protokolu z podkapitoly~\ref{sec:pr
 vracia koncový bod \code{/api/evaluation}.
 
 \paragraph{Zozbierané dáta.}
-Údaje o súbore dát sú v Tab.~\ref{tab:data}. Mená účastníkov sú v tejto
+Údaje o súbore dát (stav databázy k 20.~11.~2026) sú v Tab.~\ref{tab:data}. Mená účastníkov sú v tejto
 práci nahradené označeniami Účastník 1 až 5 (traja z účastníkov sú autormi práce;
 číslovanie je náhodné).
 
 % Tabuľka: Charakteristika zozbieraných dát.
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
   \caption{Charakteristika zozbieraných dát.}
@@ -76,21 +76,22 @@ práci nahradené označeniami Účastník 1 až 5 (traja z účastníkov sú au
     \hline
     Počet účastníkov & 5 \\
     \hline
-    Počet relácií & 12 (9 s vetou, 3 so slovom) \\
+    Počet relácií & 14 (9 s vetou, 5 so slovom) \\
     \hline
-    Počet zaznamenaných klávesových udalostí & 10\,960 \\
+    Počet zaznamenaných klávesových udalostí & 11\,560 \\
     \hline
     Počet testovacích pokusov (11--15) vo vyhodnotení (veta) & 38 \\
     \hline
-    Zloženie podľa zariadenia (notebook / stolný počítač) & notebook: 12 relácií, stolný počítač: 0 \\
+    Zloženie podľa zariadenia (notebook / stolný počítač) & notebook: 14 relácií, stolný počítač: 0 \\
     \hline
-    Zloženie podľa klávesnice (vstavaná / USB / Bluetooth) & vstavaná: 5 relácií, externá USB: 7 relácií, Bluetooth: 0 \\
+    Zloženie podľa klávesnice (vstavaná / USB / Bluetooth) & vstavaná: 7 relácií, externá USB: 7 relácií, Bluetooth: 0 \\
     \hline
   \end{tabularx}
 \end{table}
 
-Počty relácií a udalostí pochádzajú z koncového bodu \code{/api/stats} a zahŕňajú aj tri relácie s režimom slova (všetky od
-Účastníka~1, na notebooku s externou USB klávesnicou). Vyhodnotenie
+Počty relácií a udalostí pochádzajú z koncového bodu \code{/api/stats} a zahŕňajú aj päť relácií s režimom slova (tri od
+Účastníka~1 na externej USB klávesnici a po jednej od Účastníka~3
+a Účastníka~5 so vstavanou klávesnicou). Vyhodnotenie
 identifikácie v tejto podkapitole sa týka režimu vety, teda deviatich relácií.
 Všetky relácie sa zaznamenali na notebooku. Vo vete sú štyri relácie
 s externou USB klávesnicou (tri relácie Účastníka~5 a jedna relácia Účastníka~2)
@@ -108,10 +109,10 @@ pokusy sa pri tvorbe šablón aj vo vyhodnotení ignorujú
 Výsledky z koncového bodu \code{/api/evaluation} sú v Tab.~\ref{tab:vysledky}.
 
 % Tabuľka: Úspešnosť identifikácie na testovacích pokusoch 11--15.
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
-  \caption{Úspešnosť identifikácie na testovacích pokusoch 11--15.}
+  \caption{Úspešnosť identifikácie (pokusy 11--15)}
   \label{tab:vysledky}
   \begin{tabularx}{\textwidth}{|Y|M{3.5cm}|}
     \hline
@@ -131,11 +132,11 @@ Výsledky z koncového bodu \code{/api/evaluation} sú v Tab.~\ref{tab:vysledky}
 \end{table}
 
 Úspešnosť podľa účastníka uvádza Tab.~\ref{tab:participant} a maticu zámen
-Tab.~\ref{tab:confusion}. Pokus označený ako neznámy sa
-počíta ako chybný.
+Tab.~\ref{tab:confusion} (v riadkoch je skutočný účastník, v stĺpcoch predikcia). Pokus
+označený ako neznámy sa počíta ako chybný.
 
 % Tabuľka: Úspešnosť top-1 podľa účastníka.
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
   \caption{Úspešnosť top-1 podľa účastníka.}
@@ -160,10 +161,10 @@ počíta ako chybný.
 \end{table}
 
 % Tabuľka: Matica zámen (riadky: skutočný účastník, stĺpce: predikcia).
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
-  \caption{Matica zámen (riadky: skutočný účastník, stĺpce: predikcia).}
+  \caption{Matica zámen}
   \label{tab:confusion}
   \begin{tabularx}{\textwidth}{|Y|C|C|C|C|C|C|}
     \hline
@@ -206,11 +207,10 @@ identifikácie servera. Pokus mal 37 stlačení, vektor $m=73$ príznakov a celk
 čas písania približne 7,2\,s.
 
 % Tabuľka: Skutočný výsledok identifikácie jedného testovacieho pokusu.
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
-  \caption{Skutočný výsledok identifikácie jedného testovacieho pokusu
-           (Účastník~5, pokus 15).}
+  \caption{Identifikácia jedného testovacieho pokusu}
   \label{tab:priklad-real}
   \begin{tabularx}{\textwidth}{|Y|C|C|C|}
     \hline
@@ -262,11 +262,10 @@ priemernú smerodajnú odchýlku príznakov (145,7\,ms, u Účastníkov~1 a~5 le
 takže šírka šablóny nie je jediný činiteľ.
 
 % Tabuľka: Šírka šablón a vzdialenosť cudzích pokusov.
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \small
-  \caption{Šírka šablón a vzdialenosť cudzích testovacích pokusov k nim
-           (režim vety, $m=73$).}
+  \caption{Šírka šablón a vzdialenosť cudzích pokusov}
   \label{tab:sigma}
   \begin{tabularx}{\textwidth}{|Y|C|C|C|}
     \hline
@@ -304,8 +303,103 @@ má 20) mení jeden pokus úspešnosť účastníka o 20 až 33 percentuálnych 
 preto rozdiely medzi účastníkmi (od 40\,\% do 100\,\%) treba vnímať opatrne.
 Účastník~1 má navyše len tri testovacie pokusy, pretože dva boli neplatné pre
 opravu klávesom Backspace. Jediný pokus označený ako neznámy patrí účastníkovi,
-ktorý bol inak správne rozpoznaný; prah~3 by sa preto mal kalibrovať
-na samostatnej validačnej množine.
+ktorý bol inak správne rozpoznaný; prah~3 pri identifikácii by sa preto mal kalibrovať
+podobne ako prah v analýze overenia (podkapitola~\ref{sec:kalibracia}).
+
+% ----- Chyby overenia a kalibrácia prahu -----
+\subsection{Chyby overenia a kalibrácia prahu}
+\label{sec:kalibracia}
+
+Analýza z podkapitoly~\ref{sec:overenie} sa vykonala skriptom
+\code{backend/far\_frr.py} na rovnakých dátach ako identifikácia v režime vety
+(5 účastníkov, 38 testovacích pokusov, stav databázy k 20.~11.~2026).
+Tab.~\ref{tab:kalibracia} uvádza počty porovnaní a vybraný prah,
+Tab.~\ref{tab:chyby-overenia} chyby na pokusoch 14--15, ktoré sa pri výbere prahu
+nepoužili. Obr.~\ref{fig:farfrr} ukazuje krivky FAR a FRR podľa prahu
+a Obr.~\ref{fig:skore} rozdelenie skóre vlastných a cudzích porovnaní. Na
+Obr.~\ref{fig:farfrr} je zelená čiara kalibrovaný prah a prerušovaná čiara pôvodný
+prah 3; na Obr.~\ref{fig:skore} sú hodnoty nad 8 započítané do posledného stĺpca.
+
+% Tabuľka: Kalibrácia prahu overenia (režim vety).
+\begin{table}[!htbp]
+  \centering
+  \small
+  \caption{Kalibrácia prahu overenia (režim vety).}
+  \label{tab:kalibracia}
+  \begin{tabularx}{\textwidth}{|Y|M{3.5cm}|}
+    \hline
+    \rowcolor[gray]{0.9} \textbf{Ukazovateľ} & \textbf{Hodnota} \\
+    \hline
+    Kalibračné porovnania (pokusy 11--13), vlastné & 22 \\
+    \hline
+    Kalibračné porovnania (pokusy 11--13), cudzie & 88 \\
+    \hline
+    Kalibrovaný prah $\tau^{*}$ & 2,13 \\
+    \hline
+    EER na kalibračných pokusoch & 13,6\,\% \\
+    \hline
+    Testovacie porovnania (pokusy 14--15), vlastné / cudzie & 16 / 64 \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+% Tabuľka: Chyby overenia na nezávislých pokusoch 14--15 pri pôvodnom a kalibrovanom prahu.
+\begin{table}[!htbp]
+  \centering
+  \small
+  \caption{Chyby overenia na pokusoch 14--15}
+  \label{tab:chyby-overenia}
+  \begin{tabularx}{\textwidth}{|Y|C|C|}
+    \hline
+    \rowcolor[gray]{0.9} \textbf{Prah} & \textbf{FAR} & \textbf{FRR} \\
+    \hline
+    pôvodný, $\tau = 3$ & 35,9\,\% & 12,5\,\% \\
+    \hline
+    kalibrovaný, $\tau^{*} = 2{,}13$ & 10,9\,\% & 18,8\,\% \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+% Obrázok (graf z backend/far_frr.py): krivky FAR a FRR.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{far_frr_phrase.png}
+  \caption{Krivky FAR a FRR podľa prahu}
+  \label{fig:farfrr}
+\end{figure}
+
+% Obrázok (graf z backend/far_frr.py): rozdelenie skóre.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{score_distribution_phrase.png}
+  \caption{Rozdelenie skóre vlastných a cudzích porovnaní}
+  \label{fig:skore}
+\end{figure}
+
+Starý prah 3 je pre overenie príliš voľný: prepustil by viac ako tretinu
+cudzích pokusov (35,9\,\%). Nový prah 2,13 túto chybu zníži na 10,9\,\% (7 zo 64
+cudzích porovnaní), ale systém potom častejšie odmietne aj vlastný pokus
+(18,8\,\% namiesto 12,5\,\%, teda 3 zo 16 pokusov). Čo je lepšie, závisí od
+použitia: tam, kde treba chrániť prístup, je dôležitejší nízky FAR. Priemer oboch
+chýb na pokusoch 14--15 vyšiel 14,9\,\%, podobne ako EER 13,6\,\% z kalibrácie,
+takže prah nie je vyladený len na dáta, z ktorých vznikol.
+
+Obr.~\ref{fig:skore} ukazuje, prečo sa chyby nedajú odstrániť úplne. Skóre
+vlastných porovnaní sa drží okolo 1 až 2, skóre cudzích je väčšinou nad 2,5
+a má dlhý chvost, ale obe rozdelenia sa trochu prekrývajú.
+
+V režime slova (3 účastníci, 25 testovacích pokusov) vyšiel prah 1,93 a EER
+1,7\,\%. Na pokusoch 14--15 bolo FAR 0\,\% a FRR 10\,\%, kým prah 3 by dal FAR
+30\,\% a FRR 0\,\%. Dát je tu však málo (10 vlastných a 20 cudzích porovnaní)
+a veľká časť patrí jednému človeku (15 z 25 pokusov má Účastník~1), takže to
+berieme len ako ilustráciu.
+
+Aj čísla pre vetu sú orientačné. Testovacích vlastných porovnaní je len 16, takže
+jeden pokus posunie FRR o 6,25 percentuálneho bodu. Rozdelenie na kalibračné
+a testovacie pokusy je pevné (podľa poradia pokusu) a bez krížovej validácie.
+Čísla aj grafy sa dajú znovu vytvoriť príkazom \code{python far\_frr.py} (alebo
+\code{python far\_frr.py {-}{-}mode word}) v priečinku \code{backend}; skript
+vypíše výsledky a nakreslí grafy do \code{docs/figures}.
 
 % ----- Porovnanie vety a slova -----
 \subsection{Porovnanie vety a slova}
@@ -321,11 +415,48 @@ server vráti všetky dáta s poznámkou, že porovnanie nie je spravodlivé.
 Funkčnosť výpočtu sa overila na syntetických dátach troch účastníkov v oboch
 režimoch (správne počty príznakov 73 a 19 a rozdielne priemerné časy pokusu)
 a na existujúcich dátach (výsledky pre vetu sa po zavedení režimov nezmenili).
-V čase písania tohto dokumentu mal režim slova zozbierané dáta len od jedného
-účastníka (Účastník~1, tri relácie, 15 testovacích pokusov). Úspešnosť 100\,\%
-na týchto pokusoch nemá výpovednú hodnotu, pretože v tomto režime existuje
-len jedna šablóna a nie je s kým pokus zamieňať; skutočné porovnanie ešte
-nemožno vyhodnotiť.
+Podľa stavu databázy k 20.~11.~2026 má už aj režim slova dáta od troch
+účastníkov (Účastník~1, 3 a 5), ktorí písali aj vetu, takže porovnanie
+počítame na týchto troch ľuďoch. Výsledky sú v Tab.~\ref{tab:porovnanie} a na Obr.~\ref{fig:porovnanie}.
 
-\todo{doplniť tabuľku výsledkov porovnania vety a slova po zbere dát od aspoň
-troch účastníkov, ktorí absolvovali oba režimy}
+% Tabuľka: Porovnanie vety a slova na troch spoločných účastníkoch.
+\begin{table}[!htbp]
+  \centering
+  \small
+  \caption{Porovnanie vety a slova}
+  \label{tab:porovnanie}
+  \begin{tabularx}{\textwidth}{|Y|C|C|}
+    \hline
+    \rowcolor[gray]{0.9} \textbf{Ukazovateľ} & \textbf{Veta} & \textbf{Slovo} \\
+    \hline
+    Počet príznakov & 73 & 19 \\
+    \hline
+    Testovacie pokusy (11--15) & 28 & 25 \\
+    \hline
+    Top-1 & 85,71\,\% & 100,0\,\% \\
+    \hline
+    Top-3 & 100,0\,\% & 100,0\,\% \\
+    \hline
+    Podiel pokusov označených ako neznáme & 3,57\,\% & 0,0\,\% \\
+    \hline
+    Priemerný čas pokusu & 9,6~s & 2,7~s \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+% Obrázok (graf generuje server po každom uložení relácie): presnosť vety a slova.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{accuracy_chart.png}
+  \caption{Presnosť vety a slova}
+  \label{fig:porovnanie}
+\end{figure}
+
+Čísla netreba preceňovať. Pri troch šablónach je náhodný odhad pre top-1 33\,\%
+a top-3 je vždy 100\,\%, lebo v zozname sú všetci traja účastníci. Pokusy sú
+rozdelené nerovnomerne: pri vete je 20 z 28 pokusov od Účastníka~5, pri slove
+15 z 25 od Účastníka~1. Šablóna Účastníka~1 pre slovo vznikla zo všetkých troch
+jeho relácií, pre vetu má len jednu, takže náskok slova môže byť čiastočne len
+dôsledok väčšieho množstva dát. Spoľahlivo vieme povedať iba toľko, že pokus so
+slovom trvá asi 3,5-krát kratšie (2,7~s oproti 9,6~s) a že na týchto troch
+ľuďoch slovo nedopadlo horšie ako veta.

@@ -33,3 +33,8 @@ chart never fails the save. The chart needs `matplotlib` (in `requirements.txt`)
 demand: `python -c "import main; main.render_chart()"` from this folder.
 
 FastAPI also provides an interactive API browser at <http://127.0.0.1:8000/docs>.
+
+FAR/FRR analysis (offline, does not touch the database or the app): `python far_frr.py [--mode phrase|word]`
+computes genuine and impostor scores of the test attempts, picks the verification threshold at the equal-error
+point on attempts 11-13, checks it on attempts 14-15 and draws `far_frr_<mode>.png` and
+`score_distribution_<mode>.png` into `../docs/figures`.

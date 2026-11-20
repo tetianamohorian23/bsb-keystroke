@@ -41,6 +41,7 @@
 
 % --- obrázky, tabuľky, vzorce ---
 \usepackage{graphicx}                 % \includegraphics
+\usepackage{float}                    % [H] pre obrázky v príručke
 \usepackage{booktabs}                 % pekné vodorovné čiary v tabuľkách (\toprule...)
 \usepackage{tabularx}                 % tabuľky so stĺpcom roztiahnutým na šírku strany
 \usepackage{amsmath}                  % matematické prostredia (equation, align)
@@ -72,6 +73,13 @@
 \setlength{\textfloatsep}{24pt plus 4pt minus 4pt} % obrázok na začiatku/konci strany
 % Popisy: rovnaký tvar „Tab. 1“ a „Obr. 1“ ako v texte aj v šablóne TUKE
 \addto\captionsslovak{\renewcommand{\tablename}{Tab.}\renewcommand{\figurename}{Obr.}}
+
+% --- plávajúce objekty: dovoľ ich umiestniť aj s textom, aby nezostávali samy na strane ---
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+\setcounter{totalnumber}{4}
 
 % --- tabuľky: všetky na celú šírku strany, so zvislými čiarami -------------------
 % Y = text zarovnaný vľavo, C = text na stred; obe vyplnia zvyšnú šírku tabuľky.
@@ -184,6 +192,63 @@
 \begin{singlespace}
 \setlength{\parskip}{0pt}                 % bez medzier medzi riadkami obsahu
 \tableofcontents
+\end{singlespace}
+
+% --- zoznam obrázkov, zoznam tabuliek a zoznam symbolov a skratiek (ako v šablóne TUKE) ---
+% Každý zoznam začína na novej strane (\sectionbreak z preambuly) a je aj v obsahu.
+\clearpage
+\addcontentsline{toc}{section}{\listfigurename}
+\begin{singlespace}
+\setlength{\parskip}{0pt}
+\listoffigures
+\end{singlespace}
+
+\clearpage
+\addcontentsline{toc}{section}{\listtablename}
+\begin{singlespace}
+\setlength{\parskip}{0pt}
+\listoftables
+\end{singlespace}
+
+\clearpage
+\section*{Zoznam symbolov a skratiek}
+\addcontentsline{toc}{section}{Zoznam symbolov a skratiek}
+
+\begin{singlespace}
+\small
+\renewcommand{\arraystretch}{1.25}
+\setlength{\parskip}{0pt}
+
+\subsection*{Symboly}
+\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{3.2cm}Y@{}}
+  \toprule
+  $n$ & počet kláves v jednom pokuse (37 pre vetu, 10 pre slovo) \\
+  $m$ & počet príznakov jedného pokusu, $m = 2n-1$ \\
+  $h_i$ & doba držania $i$-tej klávesy \\
+  $g_i$ & interval medzi $i$-tym a $(i+1)$-vým stlačením \\
+  $\mathbf{x}$ & vektor príznakov pokusu \\
+  $\boldsymbol{\mu}$, $\boldsymbol{\sigma}$ & priemer a smerodajná odchýlka príznakov v šablóne \\
+  $d(\mathbf{x}, P)$ & štandardizovaná vzdialenosť pokusu od šablóny $P$ \\
+  $p_i$ & relatívna miera podobnosti $i$-teho z troch najbližších účastníkov \\
+  \bottomrule
+\end{tabularx}
+
+\subsection*{Skratky}
+\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{3.2cm}Y@{}}
+  \toprule
+  API & rozhranie na programovanie aplikácií \\
+  CNN, GRU & konvolučná a rekurentná neurónová sieť \\
+  CSV & textový formát s hodnotami oddelenými čiarkou \\
+  EER & chybovosť, pri ktorej sa rovnajú nesprávne prijatia a nesprávne odmietnutia \\
+  FAR, FRR & podiel prijatých cudzích a podiel odmietnutých vlastných pokusov \\
+  GDPR & všeobecné nariadenie EÚ o ochrane osobných údajov \\
+  HTTP & protokol na prenos dát medzi klientom a serverom \\
+  JSON & textový formát na výmenu dát \\
+  REST & štýl návrhu webového rozhrania cez HTTP \\
+  SQL & jazyk na prácu s databázou \\
+  top-$k$ & podiel pokusov, pri ktorých je správny účastník medzi $k$ najpodobnejšími \\
+  \bottomrule
+\end{tabularx}
 \end{singlespace}
 % (nová strana pred prvou kapitolou zabezpečuje \sectionbreak z preambuly)
 

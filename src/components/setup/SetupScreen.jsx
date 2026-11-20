@@ -1,6 +1,6 @@
 import SetupCard from "./SetupCard";
 
-export default function SetupScreen({ setup, onChange, onStart, onIdentify }) {
+export default function SetupScreen({ demoText, setup, onChange, onStart, onIdentify }) {
   return (
     <div className="setup-layout">
       <section className="intro">
@@ -8,6 +8,11 @@ export default function SetupScreen({ setup, onChange, onStart, onIdentify }) {
         <p className="lead">
           Projekt o biometrickej autentifikácii. Niekoľkokrát napíšete tú istú
           vetu alebo slovo a my zaznamenávame časy stlačenia kláves spolu s vaším menom.
+        </p>
+        {/* Len ozdoba: frázy sa "píšu" samy, preto je skrytá pre čítačky obrazovky. */}
+        <p className="type-demo" aria-hidden="true">
+          <span>{demoText}</span>
+          <i className="type-caret" />
         </p>
         <div className="metric-chips">
           <span>

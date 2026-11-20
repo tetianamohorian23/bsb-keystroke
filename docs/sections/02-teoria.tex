@@ -5,73 +5,65 @@
 
 \subsection{Behaviorálna biometria}
 
-Biometrická autentifikácia overuje alebo určuje totožnosť človeka podľa jeho
-telesných alebo behaviorálnych vlastností. Behaviorálna biometria vychádza zo
-spôsobu, akým človek koná, a dynamika písania na klávesnici patrí k jej
-najľahšie dostupným podobám: nepotrebuje špeciálny snímač, stačí bežná
-klávesnica a údaje sa dajú zbierať počas písania~\cite{roy2022,shadman2023}.
-Systematický prehľad modelov dynamiky písania z rokov 2017 až 2022
-porovnáva použité metódy, nastavenia experimentov aj otvorené
-problémy~\cite{roy2022}. Prehľadová štúdia o pojmoch, technikách a aplikáciách
-sa venuje aj dátovým súborom, písaniu na dotykových zariadeniach a použitiu
-mimo autentifikácie~\cite{shadman2023}.
+Biometria rozpoznáva človeka podľa jeho vlastností. Niektoré sú telesné,
+napríklad tvár alebo odtlačok prsta. Behaviorálna biometria sleduje, ako človek
+koná, a písanie na klávesnici je jej najdostupnejšia podoba: nepotrebuje žiadny
+špeciálny snímač, stačí bežná klávesnica a dáta sa dajú zbierať priamo počas
+písania~\cite{roy2022,shadman2023}. Prehľad modelov z rokov 2017 až 2022
+porovnáva použité metódy, nastavenia pokusov aj otvorené problémy~\cite{roy2022}.
+Novší prehľad sa venuje aj dátovým súborom, písaniu na dotykovom displeji
+a využitiu mimo prihlasovania~\cite{shadman2023}.
 
-Rozlišujú sa dve úlohy: \emph{verifikácia} (overenie, že človek je tým, za koho
-sa vydáva) a \emph{identifikácia} (určenie, ktorému zo známych ľudí sa
-záznam najviac podobá). Táto práca rieši identifikáciu. Podľa typu písaného
-textu sa ďalej rozlišuje písanie \emph{pevného} textu (všetci píšu to isté,
-ako v tejto práci) a písanie \emph{voľného} textu, ktoré umožňuje priebežné
-overovanie počas bežnej práce na počítači~\cite{shadman2023}.
+Rozlišujú sa dve úlohy. Pri \emph{verifikácii} treba overiť, že človek je tým,
+za koho sa vydáva. Pri \emph{identifikácii} sa zistí, ktorému zo známych ľudí sa
+záznam najviac podobá. Táto práca rieši identifikáciu. Text, ktorý ľudia píšu,
+môže byť \emph{pevný} (všetci píšu to isté, tak ako u nás) alebo \emph{voľný}.
+Voľný text umožňuje overovať človeka priebežne počas bežnej práce na
+počítači~\cite{shadman2023}.
 
 \subsection{Príznaky dynamiky písania}
 
-Základom sú časy stlačenia a uvoľnenia klávesov. Z nich sa odvádzajú dva
-druhy príznakov: doba držania klávesy (čas medzi stlačením a uvoľnením)
-a intervaly medzi po sebe idúcimi klávesmi, ktoré sa v literatúre nazývajú aj
-letové časy (\emph{flight time})~\cite{kaluarachchi2023}. Autori práce o súbore
-DEFT ukazujú, že doplnenie letových časov o vzdialenosť medzi klávesmi
-vytvára príznakovú množinu nezávislú od zariadenia,
-s presnosťou nad 99\,\% a chybovosťou EER pod 10\,\% na troch zariadeniach~\cite{kaluarachchi2023}.
-Aj príznaky založené len na časoch, bez znalosti obsahu textu, si pri
-verifikácii zachovávajú uspokojivý výkon~\cite{stragapede2023}.
-Práve takéto časové príznaky (doby držania a intervaly) používa aj riešenie
-v tejto práci (podkapitola~\ref{sec:priznaky}).
+Pri písaní nás zaujímajú dva druhy časov: ako dlho človek drží klávesu a aké
+dlhé sú pauzy medzi dvoma po sebe idúcimi klávesmi (v literatúre sa nazývajú
+\emph{flight time})~\cite{kaluarachchi2023}. Autori práce o súbore DEFT ukázali,
+že ak k týmto časom pridajú aj vzdialenosť medzi klávesmi, dostanú príznaky, ktoré
+fungujú na rôznych zariadeniach: presnosť nad 99\,\% a chybovosť EER pod 10\,\%
+na troch zariadeniach~\cite{kaluarachchi2023}. Dobrý výkon sa dá dosiahnuť aj
+len z časov, bez znalosti toho, čo sa píše~\cite{stragapede2023}. My používame
+práve doby držania a pauzy (podkapitola~\ref{sec:priznaky}).
 
 \subsection{Metódy vyhodnotenia}
 
-Pri klasifikácii sa používajú jednoduché štatistické miery vzdialenosti aj
-metódy strojového učenia. Porovnanie klasických algoritmov strojového učenia
-a techník výberu príznakov (filtrovacích a obalových) na úlohe autentifikácie
-podľa dynamiky písania uvádza štúdia~\cite{teotia2023}. Pri voľnom texte sa
-úspešne používajú aj hlboké neurónové siete: rekurentná sieť TypeNet
-dosiahla chybovosť EER 2,2\,\% na fyzickej klávesnici a 9,2\,\% na dotykovej
-a pri nárasti počtu používateľov až do 100\,000 sa chyba zvýšila len mierne~\cite{acien2021},
-a kombinácia konvolučnej a rekurentnej siete (CNN a GRU) dosiahla na voľnom
-texte výsledky porovnateľné s najlepšími predchádzajúcimi prístupmi~\cite{chang2021}.
-Autori porovnania z roku 2026 zdôrazňujú, že výsledky veľmi závisia od výberu
-dátového súboru a spôsobu vyhodnotenia, že hlboké učenie vedie pri voľnom texte
-a že tvrdenia o kvantových prístupoch zatiaľ nie sú podložené~\cite{gundogan2026}.
-Verejná výzva KVC porovnáva systémy na rovnakých dátach a okrem presnosti
-hodnotí aj spravodlivosť voči demografickým skupinám~\cite{stragapede2023}.
+Na rozpoznávanie stačia jednoduché štatistické vzdialenosti, ale používa sa aj
+strojové učenie. Porovnanie klasických algoritmov a výberu príznakov nájdete
+v štúdii~\cite{teotia2023}. Pri voľnom texte sa dobre darí aj hlbokým sieťam:
+sieť TypeNet dosiahla EER 2,2\,\% na klávesnici počítača a 9,2\,\% na
+dotykovej a ani pri 100\,000 používateľoch sa chyba nezvýšila veľmi~\cite{acien2021}.
+Kombinácia sietí CNN a GRU dala na voľnom texte výsledky porovnateľné
+s najlepšími staršími prácami~\cite{chang2021}. Prehľad z roku 2026 však
+upozorňuje, že výsledky veľmi závisia od zvolených dát a od spôsobu
+vyhodnotenia a že tvrdenia o kvantových metódach zatiaľ nie sú podložené~\cite{gundogan2026}.
+Aby sa systémy dali férovo porovnať, vznikla verejná súťaž KVC: testuje ich na
+rovnakých dátach a hodnotí aj spravodlivosť voči rôznym skupinám
+ľudí~\cite{stragapede2023}.
 
-Verifikačné systémy sa najčastejšie hodnotia mierou EER (\emph{equal error
-rate}), teda chybovosťou, pri ktorej je podiel nesprávne prijatých pokusov
-rovnaký ako podiel nesprávne odmietnutých~\cite{acien2021,stragapede2023}.
-Pri identifikácii na malom počte ľudí je
-prirodzenejšie sledovať, či je správny človek na prvom mieste (top-1) alebo
-medzi prvými $k$ (top-$k$); tieto metriky používa aj táto práca
-(podkapitola~\ref{sec:protokol}). Nie sú priamo porovnateľné s EER, preto sa
-výsledky tejto práce nedajú jednoducho porovnávať s číslami z citovaných
-štúdií, ktoré používajú iné dáta a iný protokol.
+Pri verifikácii sa najčastejšie uvádza EER (\emph{equal error rate}), teda
+chyba, pri ktorej sa podiel nesprávne prijatých pokusov rovná podielu nesprávne
+odmietnutých~\cite{acien2021,stragapede2023}. Pri identifikácii medzi niekoľkými
+ľuďmi dáva väčší zmysel pýtať sa, či je správny človek na prvom mieste (top-1)
+alebo aspoň medzi prvými $k$ (top-$k$). Tie používame aj my
+(podkapitola~\ref{sec:protokol}). EER a top-$k$ sa nedajú priamo porovnať
+a naše dáta aj protokol sú iné, preto naše čísla nestavíme vedľa čísel
+z citovaných prác.
 
 \subsection{Súkromie a ochrana osobných údajov}
 
-Dynamika písania je citlivý údaj. Behaviorálne príznaky môžu prezradiť aj
-pohlavie, vek, dominantnú ruku či emocionálny stav písajúceho~\cite{baig2022},
-a preto sa navrhujú protokoly, v ktorých server nikdy nevidí biometrické šablóny
-v otvorenej podobe, napríklad s využitím homomorfného šifrovania~\cite{baig2022}.
-Pri právnom posúdení treba brať do úvahy, že terminológia GDPR rozlišuje
-rozpoznávanie osoby a len klasifikáciu jej vlastností (napríklad tzv. mäkkých
-znakov) a že druhý prípad je chránený menej, čo vytvára riziká pre súkromie~\cite{bisztray2021}. Preto
-sa pri zbere údajov v tejto práci uplatňuje informovaný súhlas, minimalizácia
-údajov a lokálne úložisko (podkapitola~\ref{sec:etika}).
+Rytmus písania je citlivý údaj. Prezrádza viac, než by sa zdalo: dá sa z neho
+odhadnúť pohlavie, vek, dominantná ruka a niekedy aj nálada písajúceho~\cite{baig2022}.
+Preto vznikajú protokoly, pri ktorých server šablóny nikdy nevidí v čitateľnej
+podobe, napríklad vďaka homomorfnému šifrovaniu~\cite{baig2022}. Zložité je to aj
+právne: GDPR rozlišuje rozpoznanie osoby a len určovanie jej vlastností
+(napríklad tzv. mäkkých znakov), pričom druhý prípad chráni slabšie, čo je pre
+súkromie riziko~\cite{bisztray2021}. Preto sme pri zbere údajov žiadali
+informovaný súhlas, ukladali len to najnutnejšie a dáta držali na lokálnom
+serveri (podkapitola~\ref{sec:etika}).
