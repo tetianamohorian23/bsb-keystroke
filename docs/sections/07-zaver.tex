@@ -9,15 +9,18 @@ systém podporuje aj režim s jedným krátkym slovom a porovnanie oboch režimo
 Klientska aplikácia bola overená funkčným testom a systém je dostupný
 v repozitári \cite{repo}.
 
-Na dátach piatich účastníkov dosiahol systém na 33 testovacích pokusoch
-úspešnosť top-1 78,79\,\% a top-3 96,97\,\%, kým náhodný odhad by dal 20\,\%
-a 60\,\%. Správne na prvom mieste bolo 26 pokusov z 33.
+Na dátach piatich účastníkov dosiahol systém na 38 testovacích pokusoch
+úspešnosť top-1 78,95\,\% a top-3 97,37\,\%, kým náhodný odhad by dal 20\,\%
+a 60\,\%. Správne na prvom mieste bolo 30 pokusov z 38. Šesť z ôsmich chýb
+smeruje k jednému účastníkovi, ktorého šablóna má najširší rozptyl; pokus
+so spoločnou smerodajnou odchýlkou pre všetky šablóny zvýšil top-1 na 37
+z 38 pokusov (podkapitola~\ref{sec:test}).
 
 % ----- Obmedzenia riešenia -----
 Výsledky sú orientačné. Vzorka je malá a nerovnomerná: jeden účastník prispel
-15 pokusmi, iný len tromi. Všetky údaje vznikli na notebooku, preto sa nedá
+20 pokusmi, iný len tromi. Všetky údaje vznikli na notebooku, preto sa nedá
 posúdiť vplyv zariadenia a vplyv klávesnice len veľmi obmedzene (štyri relácie
-z ôsmich s externou USB klávesnicou). Režim slova má zatiaľ dáta len od jedného účastníka, preto
+z deviatich s vetou majú externú USB klávesnicu). Režim slova má zatiaľ dáta len od jedného účastníka, preto
 porovnanie vety a slova ešte nie je vyhodnotené. Prah pre označenie neznámeho pokusu je
 zvolený empiricky a nebol kalibrovaný na samostatných dátach. Šablóny sa
 počítajú pri každej požiadavke nanovo, čo stačí pre malý súbor dát, no pre

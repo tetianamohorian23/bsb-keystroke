@@ -76,25 +76,29 @@ práci nahradené označeniami Účastník 1 až 5 (traja z účastníkov sú au
     \hline
     Počet účastníkov & 5 \\
     \hline
-    Počet relácií & 8 \\
+    Počet relácií & 12 (9 s vetou, 3 so slovom) \\
     \hline
-    Počet zaznamenaných klávesových udalostí & 8\,946 \\
+    Počet zaznamenaných klávesových udalostí & 10\,960 \\
     \hline
-    Počet testovacích pokusov (11--15) vo vyhodnotení & 33 \\
+    Počet testovacích pokusov (11--15) vo vyhodnotení (veta) & 38 \\
     \hline
-    Zloženie podľa zariadenia (notebook / stolný počítač) & notebook: 8 relácií, stolný počítač: 0 \\
+    Zloženie podľa zariadenia (notebook / stolný počítač) & notebook: 12 relácií, stolný počítač: 0 \\
     \hline
-    Zloženie podľa klávesnice (vstavaná / USB / Bluetooth) & vstavaná: 4 relácie, externá USB: 4 relácie, Bluetooth: 0 \\
+    Zloženie podľa klávesnice (vstavaná / USB / Bluetooth) & vstavaná: 5 relácií, externá USB: 7 relácií, Bluetooth: 0 \\
     \hline
   \end{tabularx}
 \end{table}
 
-Počty relácií a udalostí pochádzajú z koncového bodu \code{/api/stats}. Všetky relácie sa zaznamenali na notebooku, štyri z nich
+Počty relácií a udalostí pochádzajú z koncového bodu \code{/api/stats} a zahŕňajú aj tri relácie s režimom slova (všetky od
+Účastníka~1, na notebooku s externou USB klávesnicou). Vyhodnotenie
+identifikácie v tejto podkapitole sa týka režimu vety, teda deviatich relácií.
+Všetky relácie sa zaznamenali na notebooku. Vo vete sú štyri relácie
 s externou USB klávesnicou (tri relácie Účastníka~5 a jedna relácia Účastníka~2)
-a štyri so vstavanou klávesnicou; vplyv zariadenia sa preto nedá vyhodnotiť
+a päť so vstavanou klávesnicou; vplyv zariadenia sa preto nedá vyhodnotiť
 a vplyv klávesnice len veľmi obmedzene.
-Štyria účastníci majú po jednej relácii, Účastník~5 má relácie štyri. Z nich
-je jedna celá neplatná (38 až 39 stlačení namiesto 37 v každom pokuse). Pri
+V režime vety majú štyria účastníci po jednej relácii, Účastník~5 má relácií päť.
+Z nich je jedna celá neplatná (38 až 39 stlačení namiesto 37 v každom pokuse)
+a v ďalšej je neplatný jeden pokus (tretí, v časti určenej na šablónu). Pri
 Účastníkovi~1 sú dva testovacie pokusy neplatné (39 stlačení namiesto 37,
 čo zodpovedá jednému preklepu a jeho oprave klávesom Backspace). Neplatné
 pokusy sa pri tvorbe šablón aj vo vyhodnotení ignorujú
@@ -113,15 +117,15 @@ Výsledky z koncového bodu \code{/api/evaluation} sú v Tab.~\ref{tab:vysledky}
     \hline
     \rowcolor[gray]{0.9} \textbf{Metrika} & \textbf{Hodnota} \\
     \hline
-    Počet testovacích pokusov (\code{total}) & 33 \\
+    Počet testovacích pokusov (\code{total}) & 38 \\
     \hline
-    Správne na prvom mieste & 26 \\
+    Správne na prvom mieste & 30 \\
     \hline
-    Top-1 (\code{top1}) & 78,79\,\% \\
+    Top-1 (\code{top1}) & 78,95\,\% \\
     \hline
-    Správny účastník medzi prvými tromi & 32 \\
+    Správny účastník medzi prvými tromi & 37 \\
     \hline
-    Top-3 (\code{top3}) & 96,97\,\% \\
+    Top-3 (\code{top3}) & 97,37\,\% \\
     \hline
   \end{tabularx}
 \end{table}
@@ -148,9 +152,9 @@ počíta ako chybný.
     \hline
     Účastník 4 & 5 & 2 & 40,0\,\% \\
     \hline
-    Účastník 5 & 15 & 13 & 86,7\,\% \\
+    Účastník 5 & 20 & 17 & 85,0\,\% \\
     \hline
-    Spolu & 33 & 26 & 78,8\,\% \\
+    Spolu & 38 & 30 & 78,9\,\% \\
     \hline
   \end{tabularx}
 \end{table}
@@ -173,14 +177,14 @@ počíta ako chybný.
     \hline
     Účastník 4 & 0 & 0 & 3 & 2 & 0 & 0 \\
     \hline
-    Účastník 5 & 0 & 0 & 2 & 0 & 13 & 0 \\
+    Účastník 5 & 0 & 0 & 3 & 0 & 17 & 0 \\
     \hline
   \end{tabularx}
 \end{table}
 
-Platia tu aj obmedzenia z podkapitoly~\ref{sec:obmedzenia}. Vzorka je malá (33 pokusov), takže jeden
+Platia tu aj obmedzenia z podkapitoly~\ref{sec:obmedzenia}. Vzorka je malá (38 pokusov), takže jeden
 pokus mení top-1 približne o 3 percentuálne body. Počet pokusov na účastníka
-je nerovnaký: Účastník~5 prispieva 15 z 33 pokusov, takže celkové čísla sú
+je nerovnaký: Účastník~5 prispieva 20 z 38 pokusov, takže celkové čísla sú
 ním výrazne ovplyvnené. Pri piatich účastníkoch so šablónou by náhodný
 odhad dosiahol top-1 20\,\% a top-3 60\,\%.
 
@@ -212,54 +216,94 @@ identifikácie servera. Pokus mal 37 stlačení, vektor $m=73$ príznakov a celk
     \hline
     \rowcolor[gray]{0.9} \textbf{Poradie a účastník} & \textbf{Vzdialenosť $d_i$} & \textbf{Váha $w_i=1/d_i$} & \textbf{Miera podobnosti $p_i$} \\
     \hline
-    1. Účastník 5 & 4,798 & 0,2084 & 65,4\,\% \\
+    1. Účastník 5 & 4,955 & 0,2018 & 64,6\,\% \\
     \hline
-    2. Účastník 3 & 16,535 & 0,0605 & 19,0\,\% \\
+    2. Účastník 3 & 16,535 & 0,0605 & 19,4\,\% \\
     \hline
-    3. Účastník 1 & 20,016 & 0,0500 & 15,7\,\% \\
+    3. Účastník 1 & 20,016 & 0,0500 & 16,0\,\% \\
     \hline
   \end{tabularx}
 \end{table}
 
 Skutočný autor pokusu je na prvom mieste. Kontrola neznámeho pokusu podľa
-vzorca~\eqref{eq:unknown} dáva $d_{\min}/\sqrt{m} = 4{,}798/\sqrt{73} \approx 0{,}56$,
+vzorca~\eqref{eq:unknown} dáva $d_{\min}/\sqrt{m} = 4{,}955/\sqrt{73} \approx 0{,}58$,
 čo je výrazne menej ako prah 3, takže pokus sa neoznačí ako neznámy. Rozdiel
-vzdialeností medzi prvým a druhým účastníkom je výrazný (4,8 oproti 16,5);
-65,4\,\% je len relatívny podiel medzi tromi najbližšími šablónami
+vzdialeností medzi prvým a druhým účastníkom je výrazný (5,0 oproti 16,5);
+64,6\,\% je len relatívny podiel medzi tromi najbližšími šablónami
 (vzorec~\eqref{eq:share}).
 
 % ----- Diskusia -----
 \subsection{Diskusia}
 
-Z Tab.~\ref{tab:confusion} vyplývajú tieto pozorovania. Sedem z 33 pokusov
-bolo určených nesprávne: tri pokusy Účastníka~4 a dva pokusy Účastníka~5 boli
+Z Tab.~\ref{tab:confusion} vyplývajú tieto pozorovania. Osem z 38 pokusov
+bolo určených nesprávne: tri pokusy Účastníka~4 a tri pokusy Účastníka~5 boli
 priradené Účastníkovi~3, jeden pokus Účastníka~1 bol priradený Účastníkovi~2
-a jeden pokus Účastníka~2 bol označený ako neznámy. Päť zo siedmich chýb
+a jeden pokus Účastníka~2 bol označený ako neznámy. Šesť z ôsmich chýb
 teda smeruje k Účastníkovi~3, ktorý bol sám rozpoznaný vo všetkých piatich
-pokusoch. V jednom prípade z 33 nebol správny účastník ani medzi prvými
-tromi (top-3 je 32 z 33).
+pokusoch. V jednom prípade z 38 nebol správny účastník ani medzi prvými
+tromi (top-3 je 37 z 38).
 
-Účastník~5 dosiahol 86,7\,\% na pokusoch z troch platných relácií.
+Účastník~5 dosiahol 85,0\,\% (17 z 20) na pokusoch zo štyroch platných relácií.
 Najslabšie je rozpoznaný Účastník~4 (40\,\%), ktorého
 pokusy sa najčastejšie zamieňajú s Účastníkom~3.
 
-% ----- Možné príčiny zámen -----
-Príčiny zámen sme neoverili. Možno má šablóna Účastníka~3 veľký rozptyl:
-štandardizovaná vzdialenosť (vzorec~\eqref{eq:dist}) delí odchýlku od
-priemeru smerodajnou odchýlkou, takže široká šablóna zmenšuje vzdialenosť
-aj pre pokusy iných účastníkov a priťahuje ich k sebe. Inou možnosťou je
-podobné tempo písania niektorých účastníkov.
+% ----- Príčiny zámen -----
+\paragraph{Príčina zámen.}
+Zámeny smerujúce k Účastníkovi~3 sa dajú vysvetliť šírkou jeho šablóny.
+Štandardizovaná vzdialenosť (vzorec~\eqref{eq:dist}) delí odchýlku od
+priemeru smerodajnou odchýlkou šablóny, takže široká šablóna zmenšuje
+vzdialenosť aj pre pokusy iných účastníkov a priťahuje ich k sebe. Údaje
+v Tab.~\ref{tab:sigma} to podporujú: šablóna Účastníka~3 má najväčšiu
+priemernú smerodajnú odchýlku príznakov (145,7\,ms, u Účastníkov~1 a~5 len
+51,0 a 53,5\,ms) a cudzie pokusy sú k nej v priemere najbližšie
+($d/\sqrt{m} = 2{,}32$ oproti 3,39 až 6,76 pri ostatných šablónach).
+Účastník~3 píše aj najpomalšie (pokus mu trvá približne 21\,s, ostatným 8 až 15\,s).
+Účastník~2 má tiež širokú šablónu (140,4\,ms), no priťahuje len jednu zámenu,
+takže šírka šablóny nie je jediný činiteľ.
+
+% Tabuľka: Šírka šablón a vzdialenosť cudzích pokusov.
+\begin{table}[ht]
+  \centering
+  \small
+  \caption{Šírka šablón a vzdialenosť cudzích testovacích pokusov k nim
+           (režim vety, $m=73$).}
+  \label{tab:sigma}
+  \begin{tabularx}{\textwidth}{|Y|C|C|C|}
+    \hline
+    \rowcolor[gray]{0.9} \textbf{Účastník} & \textbf{Priem. smerodajná odchýlka šablóny [ms]} & \textbf{Priem. čas pokusu [s]} & \textbf{Priem. $d/\sqrt{m}$ cudzích pokusov} \\
+    \hline
+    Účastník 1 & 51,0 & 8,7 & 4,35 \\
+    \hline
+    Účastník 2 & 140,4 & 15,1 & 3,39 \\
+    \hline
+    Účastník 3 & 145,7 & 21,2 & 2,32 \\
+    \hline
+    Účastník 4 & 63,6 & 12,8 & 6,76 \\
+    \hline
+    Účastník 5 & 53,5 & 7,9 & 6,67 \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+Domnienku sme overili aj jednoduchým pokusom: namiesto smerodajnej odchýlky
+každej šablóny sme pre všetkých účastníkov použili spoločnú odchýlku (priemer
+odchýlok všetkých šablón, teda bez údajov z testovacích pokusov). Top-1 vtedy
+vzrástol z 31 na 37 z 38 pokusov (97,4\,\%) a top-3 na 38 z 38; zostala jediná
+chyba (pokus Účastníka~5 priradený Účastníkovi~4) a žiadna už nesmeruje
+k Účastníkovi~3. Porovnanie je bez pravidla pre neznámy pokus, preto je
+základ 31 z 38 a nie 30 z 38. Ide o jeden pokus na malej vzorke, nie o hotové
+vylepšenie metódy; do implementácie sa nezaviedol.
 
 % ----- Obmedzenia vyhodnotenia -----
 Vplyv zariadenia sa nedá posúdiť, pretože všetky relácie vznikli na
 notebooku; vplyv klávesnice sa nedá oddeliť od vplyvu osoby (tri zo štyroch
-relácií s externou USB klávesnicou patria jednému účastníkovi). Šablóna sa
+relácií vety s externou USB klávesnicou patria jednému účastníkovi). Šablóna sa
 počíta z desiatich pokusov s 73 príznakmi, takže odhad smerodajnej odchýlky
-je nepresný. Pri troch až piatich testovacích pokusoch na osobu mení jeden
-pokus úspešnosť účastníka o 20 až 33 percentuálnych bodov, preto rozdiely
-medzi účastníkmi (od 40\,\% do 100\,\%) treba vnímať opatrne. Účastník~1
-má navyše len tri testovacie pokusy, pretože dva boli neplatné pre opravu
-klávesom Backspace. Jediný pokus označený ako neznámy patrí účastníkovi,
+je nepresný. Pri troch až piatich testovacích pokusoch na osobu (Účastník~5 ich
+má 20) mení jeden pokus úspešnosť účastníka o 20 až 33 percentuálnych bodov,
+preto rozdiely medzi účastníkmi (od 40\,\% do 100\,\%) treba vnímať opatrne.
+Účastník~1 má navyše len tri testovacie pokusy, pretože dva boli neplatné pre
+opravu klávesom Backspace. Jediný pokus označený ako neznámy patrí účastníkovi,
 ktorý bol inak správne rozpoznaný; prah~3 by sa preto mal kalibrovať
 na samostatnej validačnej množine.
 
@@ -278,7 +322,10 @@ Funkčnosť výpočtu sa overila na syntetických dátach troch účastníkov v 
 režimoch (správne počty príznakov 73 a 19 a rozdielne priemerné časy pokusu)
 a na existujúcich dátach (výsledky pre vetu sa po zavedení režimov nezmenili).
 V čase písania tohto dokumentu mal režim slova zozbierané dáta len od jedného
-účastníka, takže skutočné porovnanie ešte nemožno vyhodnotiť.
+účastníka (Účastník~1, tri relácie, 15 testovacích pokusov). Úspešnosť 100\,\%
+na týchto pokusoch nemá výpovednú hodnotu, pretože v tomto režime existuje
+len jedna šablóna a nie je s kým pokus zamieňať; skutočné porovnanie ešte
+nemožno vyhodnotiť.
 
 \todo{doplniť tabuľku výsledkov porovnania vety a slova po zbere dát od aspoň
 troch účastníkov, ktorí absolvovali oba režimy}
