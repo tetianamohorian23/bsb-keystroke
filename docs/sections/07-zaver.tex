@@ -10,24 +10,14 @@ Klientska aplikácia bola overená funkčným testom a systém je dostupný
 v repozitári \cite{repo}.
 
 Na dátach piatich účastníkov dosiahol systém na 33 testovacích pokusoch
-úspešnosť top-1 78,79\,\% a top-3 96,97\,\%. Vzorka je však malá a nerovnomerná,
-preto treba výsledok chápať ako orientačný.
-
-% ----- Zhodnotenie splnenia cieľa -----
-Cieľ práce sa podarilo splniť. Vznikol funkčný systém, ktorý zaznamená rytmus
-písania, uloží ho, vytvorí šablóny účastníkov a z jedného nového pokusu určí
-najpodobnejšieho účastníka alebo ho označí ako neznámeho. Úspešnosť top-1
-78,79\,\% je výrazne vyššia ako náhodný odhad pri piatich účastníkoch (20\,\%)
-a úspešnosť top-3 96,97\,\% je vyššia ako náhodných 60\,\%. K riešeniu patrí aj
-príručka na jeho používanie a zdrojový kód v repozitári, takže postup možno
-zopakovať.
+úspešnosť top-1 78,79\,\% a top-3 96,97\,\%, kým náhodný odhad by dal 20\,\%
+a 60\,\%. Správne na prvom mieste bolo 26 pokusov z 33.
 
 % ----- Obmedzenia riešenia -----
-Výsledky treba brať ako orientačné. Vzorka je malá (päť účastníkov a 33
-testovacích pokusov) a nerovnomerná: jeden účastník prispel 15 pokusmi, iný len
-tromi. Všetky údaje vznikli na notebooku, preto sa nedá posúdiť vplyv zariadenia
-a vplyv klávesnice len veľmi obmedzene (dve relácie s externou USB
-klávesnicou). Režim slova má zatiaľ dáta len od jedného účastníka, preto
+Výsledky sú orientačné. Vzorka je malá a nerovnomerná: jeden účastník prispel
+15 pokusmi, iný len tromi. Všetky údaje vznikli na notebooku, preto sa nedá
+posúdiť vplyv zariadenia a vplyv klávesnice len veľmi obmedzene (štyri relácie
+z ôsmich s externou USB klávesnicou). Režim slova má zatiaľ dáta len od jedného účastníka, preto
 porovnanie vety a slova ešte nie je vyhodnotené. Prah pre označenie neznámeho pokusu je
 zvolený empiricky a nebol kalibrovaný na samostatných dátach. Šablóny sa
 počítajú pri každej požiadavke nanovo, čo stačí pre malý súbor dát, no pre
@@ -35,13 +25,10 @@ väčší by to bolo pomalé. Identifikátorom účastníka je meno, takže data
 obsahuje osobné údaje.
 
 % ----- Smery ďalšieho vývoja -----
-V ďalšom vývoji je vhodné zozbierať dáta od viacerých účastníkov v niekoľkých
-reláciách, na rôznych zariadeniach a klávesniciach, aby sa dal vyhodnotiť ich
-vplyv. Po zbere dát od viacerých účastníkov v oboch režimoch treba vyhodnotiť
-porovnanie vety a slova. Prah
-neznámeho pokusu by sa mal kalibrovať na samostatnej validačnej množine a
-šablóny by sa mali ukladať namiesto opakovaného výpočtu. Namiesto mena by sa
-mal používať pseudonymný kód účastníka. Zaujímavé by bolo porovnať zvolenú
-vzdialenosť s inými mierami podobnosti a vyhodnotiť aj scenár overovania
-identity, v ktorom sa sleduje prijatie cudzieho a odmietnutie vlastného
-používateľa.
+Ďalej treba zozbierať dáta od viacerých účastníkov v niekoľkých reláciách, na
+rôznych zariadeniach a klávesniciach, a vyhodnotiť porovnanie vety a slova
+(zatiaľ chýba). Prah neznámeho pokusu sa má kalibrovať na samostatnej
+validačnej množine, šablóny sa majú ukladať namiesto opakovaného výpočtu
+a namiesto mena sa má používať pseudonymný kód. Neskôr sa dá porovnať zvolená
+vzdialenosť s inými mierami a vyhodnotiť aj verifikácia, teda prijatie cudzieho
+a odmietnutie vlastného používateľa.

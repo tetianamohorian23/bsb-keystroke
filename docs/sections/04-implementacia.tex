@@ -35,7 +35,6 @@ Použité technológie sú zhrnuté v Tab.~\ref{tab:tech}.
 Zdrojový kód klienta je v priečinku \code{src/}. Aplikácia je rozdelená na
 obrazovky, opakovane použiteľné komponenty, hooky a pomocné funkcie:
 
-% Odrážkový zoznam.
 \begin{itemize}
   \item \code{App.jsx} riadi prechody medzi stavmi (\code{setup},
         \code{run}, \code{identify}, \code{done}) a drží
@@ -168,9 +167,8 @@ bolo vhodné šablóny ukladať.
 \subsection{Známe obmedzenia implementácie}
 \label{sec:obmedzenia}
 
-Pri analýze kódu sa zistili tieto obmedzenia, ktoré treba brať do úvahy
+Pri analýze kódu sme našli tieto obmedzenia, ktoré treba zohľadniť
 pri interpretácii výsledkov:
-% Odrážkový zoznam.
 \begin{itemize}
   \item Pôvodná verzia klienta nerozpoznávala stlačenie Backspace ani
         Delete ako chybu: pokus s opravou, ktorý skončil správnym textom,
@@ -244,7 +242,6 @@ nezapíše dvakrát.
 
 Výpočet vektora príznakov z jedného pokusu (\code{backend/main.py}, skrátené):
 
-% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
 \begin{lstlisting}[language=Python]
 # 1. Udalosti pokusu zoradíme a rozdelíme na stlačenia a uvoľnenia
 frame = pd.DataFrame(rows).sort_values("seq")
@@ -272,7 +269,6 @@ return holds + intervals
 
 Šablóna účastníka a vzdialenosť nového pokusu od nej:
 
-% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
 \begin{lstlisting}[language=Python]
 # Každý riadok matice je jeden platný pokus (2n-1 príznakov), pokusy 1-10 jedného režimu
 matrix = pd.DataFrame(vectors)
@@ -296,7 +292,6 @@ unknown = best_distance / sqrt(len(vector)) > 3
 Uloženie relácie (skrátené; \code{rows} obsahuje všetky udalosti
 všetkých pokusov):
 
-% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
 \begin{lstlisting}
 # Požiadavka: uloženie relácie (skrátené)
 POST /api/sessions
@@ -313,7 +308,6 @@ POST /api/sessions
 
 Identifikácia jedného pokusu (počet stlačení a uvoľnení podľa režimu):
 
-% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
 \begin{lstlisting}
 # Požiadavka: identifikácia jedného pokusu (mode: "phrase" alebo "word")
 POST /api/identify
@@ -337,7 +331,6 @@ POST /api/identify
 
 Hodnoty \code{distance} v ukážke sú ilustračné. Vyhodnotenie:
 
-% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
 \begin{lstlisting}
 # Vyhodnotenie na pokusoch 11-15 (ukážkové čísla); mode = phrase | word
 GET /api/evaluation?mode=word
@@ -349,7 +342,6 @@ GET /api/evaluation?mode=word
 
 Porovnanie režimov (výsledky pre každý režim majú tvar ako vyššie):
 
-% Výpis kódu/príkazov: obsah sa vypíše presne tak, ako je napísaný; komentáre v kóde sú po slovensky.
 \begin{lstlisting}
 # Spravodlivé porovnanie (common) a všetci účastníci (all)
 GET /api/compare

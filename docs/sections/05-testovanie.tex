@@ -183,13 +183,11 @@ počíta ako chybný.
   \end{tabularx}
 \end{table}
 
-Pri interpretácii výsledkov treba zohľadniť obmedzenia z
-podkapitoly~\ref{sec:obmedzenia}. Vzorka je malá (33 pokusov), takže jeden
+Platia tu aj obmedzenia z podkapitoly~\ref{sec:obmedzenia}. Vzorka je malá (33 pokusov), takže jeden
 pokus mení top-1 približne o 3 percentuálne body. Počet pokusov na účastníka
 je nerovnaký: Účastník~5 prispieva 15 z 33 pokusov, takže celkové čísla sú
 ním výrazne ovplyvnené. Pri piatich účastníkoch so šablónou by náhodný
-odhad dosiahol top-1 20\,\% a top-3 60\,\%. Hodnoty $p_i$ zobrazené
-v aplikácii nie sú pravdepodobnosti.
+odhad dosiahol top-1 20\,\% a top-3 60\,\%.
 
 \paragraph{Postup na získanie čísel.} Po zbere dát spustite server a
 otvorte v prehliadači adresu \code{/api/evaluation} servera; odpoveď
@@ -217,13 +215,13 @@ identifikácie servera. Pokus mal 37 stlačení, vektor $m=73$ príznakov a celk
   \label{tab:priklad-real}
   \begin{tabularx}{\textwidth}{|Y|C|C|C|}
     \hline
-    \rowcolor[gray]{0.9} \textbf{Poradie a účastník} & \textbf{Vzdialenosť $d_i$} & \textbf{Váha $w_i=1/d_i$} & \textbf{Miera podobnosti $p_i$} \
+    \rowcolor[gray]{0.9} \textbf{Poradie a účastník} & \textbf{Vzdialenosť $d_i$} & \textbf{Váha $w_i=1/d_i$} & \textbf{Miera podobnosti $p_i$} \\
     \hline
-    1. Účastník 5 & 4,798 & 0,2084 & 65,4\,\% \
+    1. Účastník 5 & 4,798 & 0,2084 & 65,4\,\% \\
     \hline
-    2. Účastník 3 & 16,535 & 0,0605 & 19,0\,\% \
+    2. Účastník 3 & 16,535 & 0,0605 & 19,0\,\% \\
     \hline
-    3. Účastník 1 & 20,016 & 0,0500 & 15,7\,\% \
+    3. Účastník 1 & 20,016 & 0,0500 & 15,7\,\% \\
     \hline
   \end{tabularx}
 \end{table}
@@ -231,10 +229,9 @@ identifikácie servera. Pokus mal 37 stlačení, vektor $m=73$ príznakov a celk
 Skutočný autor pokusu je na prvom mieste. Kontrola neznámeho pokusu podľa
 vzorca~\eqref{eq:unknown} dáva $d_{\min}/\sqrt{m} = 4{,}798/\sqrt{73} \approx 0{,}56$,
 čo je výrazne menej ako prah 3, takže pokus sa neoznačí ako neznámy. Rozdiel
-vzdialeností medzi prvým a druhým účastníkom je výrazný (4,8 oproti 16,5),
-no, ako uvádza vzorec~\eqref{eq:share}, hodnoty $p_i$ nie sú
-pravdepodobnosti: 65,4\,\% vyjadruje len relatívny podiel medzi tromi
-najbližšími šablónami. Rovnaký výsledok zobrazuje aj demonštračné video
+vzdialeností medzi prvým a druhým účastníkom je výrazný (4,8 oproti 16,5);
+65,4\,\% je len relatívny podiel medzi tromi najbližšími šablónami
+(vzorec~\eqref{eq:share}). Rovnaký výsledok zobrazuje aj demonštračné video
 (podkapitola~\ref{sec:video}).
 
 % ----- Diskusia -----
@@ -248,19 +245,17 @@ teda smeruje k Účastníkovi~3, ktorý bol sám rozpoznaný vo všetkých piati
 pokusoch. V jednom prípade z 33 nebol správny účastník ani medzi prvými
 tromi (top-3 je 32 z 33).
 
-Účastník~5 dosiahol 86,7\,\%, čo je najvyššia úspešnosť spomedzi
-účastníkov s viac ako piatimi pokusmi; jeho pokusy pochádzajú z troch
-platných relácií. Najslabšie je rozpoznaný Účastník~4 (40\,\%), ktorého
+Účastník~5 dosiahol 86,7\,\% na pokusoch z troch platných relácií.
+Najslabšie je rozpoznaný Účastník~4 (40\,\%), ktorého
 pokusy sa najčastejšie zamieňajú s Účastníkom~3.
 
 % ----- Možné príčiny zámen -----
-Presnú príčinu zámen sa v práci nepodarilo overiť, pretože sa nepreskúmali
-smerodajné odchýlky jednotlivých šablón. Pravdepodobným vysvetlením je, že
-šablóna Účastníka~3 má pri viacerých príznakoch veľký rozptyl. Štandardizovaná
-vzdialenosť (vzorec~\eqref{eq:dist}) delí odchýlku od priemeru smerodajnou
-odchýlkou, takže široká šablóna zmenšuje vzdialenosť aj pre pokusy iných
-účastníkov a priťahuje ich k sebe. Druhou možnosťou je podobné tempo písania
-niektorých účastníkov. Obe vysvetlenia sú zatiaľ len hypotézy; dali by sa
+Príčinu zámen sme neoverili, pretože sme nepreskúmali smerodajné odchýlky
+jednotlivých šablón. Možno má šablóna Účastníka~3 pri viacerých príznakoch
+veľký rozptyl. Štandardizovaná vzdialenosť (vzorec~\eqref{eq:dist}) delí
+odchýlku od priemeru smerodajnou odchýlkou, takže široká šablóna zmenšuje
+vzdialenosť aj pre pokusy iných účastníkov a priťahuje ich k sebe. Inou
+možnosťou je podobné tempo písania niektorých účastníkov. Hypotézy by sa dali
 overiť porovnaním smerodajných odchýlok šablón a vzdialeností chybne priradených
 pokusov.
 
@@ -268,27 +263,23 @@ pokusov.
 Vplyv zariadenia sa nedá posúdiť, pretože všetky relácie vznikli na notebooku.
 Externá USB klávesnica sa použila v štyroch reláciách z ôsmich, no tri z nich
 patria jednému účastníkovi, takže vplyv klávesnice sa nedá oddeliť od vplyvu
-osoby a údajov je príliš málo na akýkoľvek záver. Je však možné, že zmena klávesnice mení rytmus písania
-aj u toho istého človeka, preto by sa v ďalšom zbere mali pokusy z rôznych
-klávesníc označovať a vyhodnocovať osobitne.
+osoby a údajov je príliš málo na akýkoľvek záver. V ďalšom zbere by sa mali
+pokusy z rôznych klávesníc označovať a vyhodnocovať osobitne.
 
 % ----- Počet pokusov a kvalita šablóny -----
 Šablóna sa počíta z najviac desiatich pokusov, pričom každý pokus má 73
 príznakov. Pri takom malom počte pokusov je odhad smerodajnej odchýlky
 nepresný, čo môže rozpoznávanie zhoršovať. Účastník~1 má navyše len tri
 testovacie pokusy, pretože dva boli neplatné pre opravu klávesom Backspace,
-a Účastník~5 prispel až 15 pokusmi, takže jeho výsledok (86,7\,\%) má na celkové
-číslo väčšiu váhu. Rozdiely medzi účastníkmi (od 40\,\% do 100\,\%) treba
+Rozdiely medzi účastníkmi (od 40\,\% do 100\,\%) treba
 vnímať opatrne: pri troch až piatich pokusoch na osobu mení jeden pokus
 úspešnosť účastníka o 20 až 33 percentuálnych bodov.
 
 % ----- Návrhy na zlepšenie -----
-Presnosť by sa dala zlepšiť väčším počtom pokusov a relácií na účastníka,
-kalibráciou prahu pre neznámeho používateľa na samostatnej
-validačnej množine. Ako neznámy bol zatiaľ označený jediný pokus, a to pri
-účastníkovi, ktorý bol inak správne rozpoznaný v štyroch z piatich pokusov.
-Môže to naznačovať, že prah~3 je dosť prísny, no jeden prípad na takýto záver
-nestačí.
+Ako neznámy bol označený jediný pokus, a to pri účastníkovi, ktorý bol inak
+správne rozpoznaný v štyroch z piatich pokusov. Prah~3 môže byť príliš prísny,
+no jeden prípad na záver nestačí; prah by sa mal kalibrovať na samostatnej
+validačnej množine.
 
 % ----- Porovnanie vety a slova -----
 \subsection{Porovnanie vety a slova}
