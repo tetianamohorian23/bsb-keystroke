@@ -7,6 +7,7 @@ import RunScreen from "./components/run/RunScreen";
 import SetupScreen from "./components/setup/SetupScreen";
 import { usePressedKeys } from "./hooks/usePressedKeys";
 import { useRandomKeys } from "./hooks/useRandomKeys";
+import { isTouchDevice } from "./utils/device";
 
 const INITIAL_SETUP = {
   id: "",
@@ -17,6 +18,7 @@ const INITIAL_SETUP = {
 };
 
 export default function App() {
+  const [touchDevice] = useState(isTouchDevice);
   const [phase, setPhase] = useState("setup"); // setup | run | identify | done
   const [setup, setSetup] = useState(INITIAL_SETUP);
   const [session, setSession] = useState(null); // { meta, rows, summary }
@@ -43,6 +45,18 @@ export default function App() {
   };
 
   const backToSetup = () => setPhase("setup");
+
+  if (touchDevice) {
+    return (
+      <main className="blocked" role="alert">
+        <h1>Nie je podporované</h1>
+        <p className="lead">
+          Dynamika písania sa meria len na fyzickej klávesnici. Dotyková klávesnica na telefóne
+          alebo tablete nie je podporovaná, otvorte stránku na počítači alebo notebooku.
+        </p>
+      </main>
+    );
+  }
 
   return (
     <>

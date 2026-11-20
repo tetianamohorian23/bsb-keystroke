@@ -198,3 +198,16 @@ main.home .setup-card .check input:checked::after {
   width: 8px;
   height: 14px;
 }
+
+/* Telefón / tablet: stránka nie je podporovaná. */
+main.blocked {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  padding-bottom: 28px;
+}
+
+main.blocked h1 {
+  font-size: clamp(2rem, 9vw, 3rem);
+}
