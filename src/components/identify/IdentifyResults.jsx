@@ -1,4 +1,4 @@
-export default function IdentifyResults({ result, onRetry, onBack }) {
+export default function IdentifyResults({ result, onBack }) {
   return (
     <div className="identify-results">
       <h2>
@@ -13,9 +13,6 @@ export default function IdentifyResults({ result, onRetry, onBack }) {
         </div>
       ))}
       <div className="identify-actions">
-        <button className="ghost" onClick={onRetry}>
-          Skontrolovať znova
-        </button>
         <button className="ghost" onClick={onBack}>
           Späť
         </button>

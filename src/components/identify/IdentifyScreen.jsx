@@ -15,17 +15,13 @@ export default function IdentifyScreen({ mode: modeKey, onBack }) {
 
   const attempt = useTypingAttempt({ target: mode.text, onEnter: finish });
 
-  // Staré hlásenie zmizne, keď účastník začne písať.
+  // Staré hlásenie a výsledok zmiznú, keď účastník začne písať.
   useEffect(() => {
-    if (attempt.text) setMessage(EMPTY_MESSAGE);
+    if (attempt.text) {
+      setMessage(EMPTY_MESSAGE);
+      setResult(null);
+    }
   }, [attempt.text]);
-
-  function retry() {
-    setResult(null);
-    setMessage(EMPTY_MESSAGE);
-    attempt.reset();
-    attempt.inputRef.current?.focus();
-  }
 
   async function finish() {
     const eventRows = attempt.getEventRows();
@@ -73,7 +69,7 @@ export default function IdentifyScreen({ mode: modeKey, onBack }) {
         </p>
         <p className="attempt-count">Enter — odoslať</p>
       </div>
-      {result && <IdentifyResults result={result} onRetry={retry} onBack={onBack} />}
+      {result && <IdentifyResults result={result} onBack={onBack} />}
     </section>
   );
 }
