@@ -54,7 +54,9 @@ obrazovky, opakovane použiteľné komponenty, hooky a pomocné funkcie:
   \item \code{hooks/useRandomKeys.js} na úvodnej obrazovke náhodne
         „stláča“ klávesy pozadia ako ukážkovú animáciu (vypína sa pri
         nastavení systému \emph{znížený pohyb}),
-  \item \code{utils/} obsahuje volania API, export do CSV a výpočet súhrnu,
+  \item \code{utils/} obsahuje volania API, export do CSV, výpočet súhrnu,
+        text hlásení o chybe (\code{mistake.js}) a zisťovanie dotykového
+        zariadenia (\code{device.js}),
   \item \code{styles/} obsahuje štýly rozdelené podľa obrazovky.
 \end{itemize}
 
@@ -77,6 +79,16 @@ Počas merania sa v reálnom čase kreslí graf rytmu na plátno
 pokusu a zlaté predchádzajúcemu. Pozadie tvorí stylizovaná klávesnica, ktorá
 zvýrazňuje práve stlačené klávesy a nemá vplyv na meranie.
 Obrazovka prípravy relácie je na Obr.~\ref{fig:setup}.
+
+Dynamika písania sa meria len na fyzickej klávesnici. Dotykové klávesnice
+telefónov často posielajú udalosti s \code{key = "Unidentified"} a ich časy
+sú nepresné, preto \code{utils/device.js} pri štarte zistí dotykové zariadenie
+a \code{App.jsx} namiesto aplikácie zobrazí hlásenie „Nie je podporované“.
+Zariadenie sa rozpozná podľa \code{userAgentData.mobile}, reťazca
+\emph{User-Agent} a podľa vlastností obrazovky (\code{pointer: coarse},
+\code{hover: none} a viac dotykových bodov), takže ho nezmení ani voľba
+„zobrazenie pre PC“ v prehliadači. Ide len o upozornenie, nie o bezpečnostnú
+ochranu. Úvodná obrazovka je na počítačoch pevná (bez posúvania stránky).
 
 % Obrázok (obrázok zo súboru figures/ui-setup.png): Obrazovka prípravy relácie.
 \begin{figure}[ht]
