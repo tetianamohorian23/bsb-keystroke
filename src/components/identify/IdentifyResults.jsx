@@ -6,7 +6,7 @@ export default function IdentifyResults({ result, onBack }) {
           ? "Neznámy používateľ"
           : `Najviac sa podobá na: ${result.name}`}
       </h2>
-      {result.matches.map((match) => (
+      {!result.unknown && result.matches.map((match) => (
         <div className="match" key={match.name}>
           <span>{match.name}</span>
           <b>{match.percent}%</b>

@@ -22,7 +22,7 @@
   width: 100%;
   margin: 0;
   padding: 0 1.5vw;
-  transform: perspective(1300px) rotateX(32deg) translateY(4vh);
+  transform: perspective(1300px) rotateX(32deg) translateY(-8vh);
   transform-origin: bottom;
 }
 
@@ -95,7 +95,7 @@ body:has(main.running) .k.on {
   }
 
   .kb {
-    transform: perspective(900px) rotateX(28deg) translateY(2vh);
+    transform: perspective(900px) rotateX(28deg) translateY(-6vh);
   }
 
   .k {
