@@ -1,6 +1,7 @@
 const block = (e) => e.preventDefault();
 
-// Vstupné pole, v ktorom je zakázané vkladanie a presúvanie textu.
+// Skryté vstupné pole (zachytáva klávesy; text sa zobrazuje priamo vo vete).
+// Vkladanie a presúvanie textu je zakázané.
 export default function TypingInput({ attempt, ariaLabel }) {
   return (
     <input
@@ -15,7 +16,7 @@ export default function TypingInput({ attempt, ariaLabel }) {
       autoComplete="off"
       spellCheck="false"
       aria-label={ariaLabel}
-      placeholder="Začnite písať…"
+      readOnly={Boolean(attempt.mistake)}
     />
   );
 }

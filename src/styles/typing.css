@@ -52,17 +52,40 @@
 }
 
 .phrase .cur {
+  position: relative;
   color: var(--ink);
-  box-shadow: inset 0 -2px var(--orange);
 }
 
+/* Blikajúci kurzor pred ďalším znakom (ako v Monkeytype). */
+.phrase .cur::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 8%;
+  width: 2px;
+  height: 84%;
+  border-radius: 1px;
+  background: var(--orange);
+  animation: caret 1s steps(1) infinite;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Skryté pole: ostáva zaostrené a prijíma klávesy, napísané znaky sa kreslia vo vete. */
 .typing-input {
-  margin-top: 10px;
-  font: 500 0.95rem "DM Mono", monospace;
-}
-
-.typing-input::placeholder {
-  color: #59615f;
+  position: fixed;
+  top: 0;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .row {
@@ -149,46 +172,77 @@
   transition: width 0.35s;
 }
 
-/* Kompaktná verzia počas merania (main.running) */
+/* Obrazovky písania (meranie a rozpoznávanie): rovnaké veľké rozmery ako úvodná obrazovka. */
 .running .run-card {
-  padding: 17px 20px;
-  border-radius: 16px;
+  padding: clamp(22px, 2.8vw, 42px);
+  border-radius: 18px;
+}
+
+.running .status-row {
+  padding-bottom: 12px;
+}
+
+.running .status-row strong {
+  font-size: clamp(1.3rem, 1.6vw, 1.7rem);
 }
 
 .running .status-row small {
-  font-size: 0.82rem;
+  font-size: clamp(0.85rem, 1vw, 1rem);
 }
 
 .running .timer-dot {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
 .running .run-heading {
-  padding: 14px 0 9px;
+  padding: clamp(12px, 1.8vh, 20px) 0 clamp(8px, 1.2vh, 14px);
 }
 
 .running .run-heading h2 {
-  font-size: 1.15rem;
+  font-size: clamp(1.4rem, 1.8vw, 2rem);
+}
+
+.running .section-label {
+  font-size: clamp(0.82rem, 0.95vw, 1rem);
 }
 
 .running .phrase {
-  padding: 11px 14px;
-  font-size: 1.1rem;
+  padding: clamp(14px, 1.6vw, 22px) clamp(18px, 2.2vw, 32px);
+  border-radius: 14px;
+  font-size: clamp(1.4rem, 2.1vw, 2.3rem);
 }
 
-.running .typing-input {
-  margin-top: 8px;
-  padding: 10px 12px;
-  font-family: Manrope, system-ui, sans-serif;
-  letter-spacing: 0;
+.running .row {
+  margin-top: 12px;
 }
 
 .running .row p {
-  font-size: 0.86rem;
+  font-size: clamp(0.95rem, 1.1vw, 1.2rem);
 }
 
 .running .row .attempt-count {
   font-family: Manrope, system-ui, sans-serif;
+}
+
+.running .rhythm-canvas {
+  height: clamp(96px, 11vh, 112px);
+}
+
+.running .legend {
+  font-size: clamp(0.85rem, 0.95vw, 1rem);
+}
+
+.running .progress-meta {
+  font-size: clamp(0.85rem, 0.95vw, 1rem);
+}
+
+.running .bar {
+  height: 7px;
+}
+
+.running .run-card button {
+  padding: clamp(14px, 2vh, 19px) clamp(20px, 1.8vw, 28px);
+  font-size: clamp(1rem, 1.1vw, 1.2rem);
 }
 
 @media (max-width: 700px) {
@@ -199,4 +253,50 @@
   .run-heading h2 {
     font-size: 1.15rem;
   }
+}
+
+/* Chyba pri písaní: zvýraznený rámček, zatrasenie a zamknutý vstup. */
+.phrase.shake {
+  border-color: var(--bad);
+  animation: shake 0.4s;
+}
+
+@keyframes shake {
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phrase.shake {
+    animation: none;
+  }
+
+  .phrase .cur::before {
+    animation: none;
+  }
+}
+
+/* Rovnomerné rozostupy medzi časťami karty písania. */
+.running .run-card {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.4vh, 16px);
+}
+
+.running .run-card > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.running .run-card .roll,
+.running .run-card .row {
+  margin-top: 0;
+}
+
+.running .run-card .progress-meta + .bar {
+  margin-top: calc(-1 * clamp(6px, 1vh, 10px));
+}
+
+.running .run-card .roll .legend {
+  margin-top: 8px;
 }

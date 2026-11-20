@@ -5,7 +5,7 @@ bsb-keystroke/
 |-- package.json, package-lock.json, vite.config.js
 |-- src/
 |   |-- App.jsx                  prepinanie obrazoviek
-|   |-- constants.js             veta, pocet opakovani, ignorovane klavesy
+|   |-- constants.js             rezimy (veta/slovo), pocet opakovani, ignorovane klavesy
 |   |-- data/keyboardLayout.js   rozlozenie klavesnice v pozadi
 |   |-- components/
 |   |   |-- setup/               uvodna obrazovka
@@ -13,11 +13,12 @@ bsb-keystroke/
 |   |   |-- identify/            rozpoznanie pokusu
 |   |   |-- done/                zaverecna obrazovka
 |   |   `-- typing/              spolocne casti karty s pisanim
-|   |-- hooks/                   useTypingAttempt, usePressedKeys
+|   |-- hooks/                   useTypingAttempt, usePressedKeys, useRandomKeys
 |   |-- utils/                   api, csv, summary
 |   `-- styles/                  CSS rozdelene podla obrazovky
 |-- backend/
-|   |-- main.py                  API, sablony, identifikacia, vyhodnotenie
+|   |-- main.py                  API, sablony, identifikacia, vyhodnotenie, porovnanie
+|   |-- accuracy_chart.png       graf presnosti veta vs. slovo (generuje server)
 |   |-- requirements.txt
 |   `-- README.md
 |-- docs/                        technicka dokumentacia (LaTeX)

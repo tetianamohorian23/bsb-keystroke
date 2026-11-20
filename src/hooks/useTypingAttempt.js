@@ -1,15 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CORRECTION_KEYS, IGNORED_KEYS } from "../constants";
+import { CORRECTION_KEYS, IGNORED_KEYS, MISTAKE_MS } from "../constants";
 
 /**
  * Zaznamenáva časy stlačenia a uvoľnenia kláves jedného pokusu písania.
- * `onEnter` sa zavolá po stlačení Enter; `onMistake` po stlačení Backspace/Delete
- * (kláves sa nevykoná). Ak je zadaný `target`, nesprávny znak tiež zavolá `onMistake`. Vždy sa použije najnovšia verzia callbackov.
+ * `onEnter` sa zavolá po stlačení Enter. Chyba (Backspace/Delete alebo, ak je zadaný
+ * `target`, znak, po ktorom text nie je začiatkom cieľa) pokus nezruší hneď: na
+ * MISTAKE_MS sa zamkne vstup a `mistake` opíše, čo sa stalo ({ kind, typed, expected });
+ * potom sa pokus vynuluje. Počas zámku sa všetky klávesy ignorujú. `onMistake` sa
+ * zavolá pri vzniku chyby. Vždy sa použije najnovšia verzia callbackov.
  */
 export function useTypingAttempt({ target, onEnter, onMistake }) {
   const inputRef = useRef(null);
   const [text, setText] = useState("");
   const [bars, setBars] = useState([]);
+  const [mistake, setMistake] = useState(null);
+  const locked = useRef(false);
+  const unlockTimer = useRef(null);
 
   const events = useRef([]);
   const liveBars = useRef([]);
@@ -28,12 +34,27 @@ export function useTypingAttempt({ target, onEnter, onMistake }) {
     setBars([]);
   }, []);
 
+  const flagMistake = useCallback((info) => {
+    if (locked.current) return;
+    locked.current = true;
+    setMistake(info);
+    onMistakeRef.current?.(info);
+    unlockTimer.current = setTimeout(() => {
+      locked.current = false;
+      setMistake(null);
+      reset();
+      inputRef.current?.focus();
+    }, MISTAKE_MS);
+  }, [reset]);
+
+  useEffect(() => () => clearTimeout(unlockTimer.current), []);
+
   useEffect(() => {
     const input = inputRef.current;
     input.focus();
 
     const onKeyDown = (e) => {
-      if (e.repeat) {
+      if (e.repeat || locked.current) {
         e.preventDefault();
         return;
       }
@@ -44,7 +65,7 @@ export function useTypingAttempt({ target, onEnter, onMistake }) {
       }
       if (CORRECTION_KEYS.has(e.code)) {
         e.preventDefault();
-        onMistakeRef.current?.();
+        flagMistake({ kind: "correction" });
         return;
       }
       if (IGNORED_KEYS.has(e.code)) {
@@ -61,7 +82,7 @@ export function useTypingAttempt({ target, onEnter, onMistake }) {
     };
 
     const onKeyUp = (e) => {
-      if (IGNORED_KEYS.has(e.code) || CORRECTION_KEYS.has(e.code)) {
+      if (IGNORED_KEYS.has(e.code) || CORRECTION_KEYS.has(e.code) || locked.current) {
         e.preventDefault();
         return;
       }
@@ -79,11 +100,21 @@ export function useTypingAttempt({ target, onEnter, onMistake }) {
       setBars([...liveBars.current]);
     };
 
+    // Pole je skryté, preto ho po kliknutí kamkoľvek alebo pri písaní mimo neho znova zaostríme.
+    const refocus = (e) => {
+      if (e.target instanceof Element && e.target.closest("button, a, select")) return;
+      if (document.activeElement !== input) input.focus();
+    };
+
     input.addEventListener("keydown", onKeyDown);
     input.addEventListener("keyup", onKeyUp);
+    window.addEventListener("mousedown", refocus);
+    window.addEventListener("keydown", refocus);
     return () => {
       input.removeEventListener("keydown", onKeyDown);
       input.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("mousedown", refocus);
+      window.removeEventListener("keydown", refocus);
     };
   }, []);
 
@@ -100,10 +131,15 @@ export function useTypingAttempt({ target, onEnter, onMistake }) {
   return {
     inputRef,
     text,
-    // Nesprávny znak (text nie je začiatkom cieľového textu) ihneď zruší pokus.
+    mistake,
+    // Nesprávny znak (text nie je začiatkom cieľového textu) spustí chybový stav.
     setText: (value) => {
+      if (locked.current) return;
       if (target && !target.startsWith(value)) {
-        onMistakeRef.current?.();
+        let index = 0;
+        while (index < value.length && value[index] === target[index]) index += 1;
+        setText(value);
+        flagMistake({ kind: "wrong", index, typed: value[index], expected: target[index] ?? "" });
         return;
       }
       setText(value);

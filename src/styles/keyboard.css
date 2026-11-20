@@ -1,40 +1,46 @@
-/* Klávesnica v pozadí: jedna spoločná vrstva pre všetky obrazovky. */
+/* Klávesnica v pozadí: jedna spoločná vrstva pre všetky obrazovky.
+   Je na celú šírku okna dole a obsah stránky sa drží nad ňou (--kb-space). */
+:root {
+  --kb-space: 38vh;
+}
+
 .kb-bg {
   position: fixed;
   z-index: 0;
-  inset: auto 0 26px;
-  height: 210px;
+  inset: auto 0 0;
+  height: var(--kb-space);
   overflow: hidden;
   pointer-events: none;
-  opacity: 0.55;
-  mask-image: linear-gradient(transparent, #000 30%);
+  opacity: 0.85;
+  mask-image: linear-gradient(transparent, #000 55%);
 }
 
 .kb {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  width: min(1100px, 100%);
-  margin: 20px auto 0;
-  transform: perspective(900px) rotateX(22deg) translateY(26px);
+  gap: clamp(5px, 0.8vw, 12px);
+  width: 100%;
+  margin: 0;
+  padding: 0 1.5vw;
+  transform: perspective(1300px) rotateX(32deg) translateY(4vh);
   transform-origin: bottom;
 }
 
 .kr {
   display: flex;
   justify-content: center;
-  gap: 5px;
+  gap: clamp(5px, 0.8vw, 12px);
 }
 
 .k {
   flex: 1;
-  height: 31px;
-  padding: 4px 7px;
+  height: clamp(34px, 7vh, 74px);
+  padding: 8px 12px;
   border: 1px solid #39322e;
-  border-radius: 5px;
+  border-radius: 10px;
   background: #191716;
   color: #82766c;
-  font: 500 0.56rem "DM Mono", monospace;
+  font: 500 clamp(0.6rem, 0.9vw, 0.85rem) "DM Mono", monospace;
   text-transform: uppercase;
   transition: background 0.12s, box-shadow 0.12s, transform 0.12s;
 }
@@ -42,14 +48,13 @@
 .k.on {
   background: var(--orange);
   color: #24140f;
-  box-shadow: 0 0 20px var(--orange);
-  transform: translateY(2px);
+  box-shadow: 0 0 34px var(--orange);
+  transform: translateY(3px) scale(0.97);
 }
 
-/* Počas merania je klávesnica výraznejšia. */
+/* Počas písania (meranie a rozpoznávanie) je klávesnica výraznejšia. */
 body:has(main.running) .kb-bg {
-  opacity: 0.62;
-  mask-image: linear-gradient(transparent, #000 25%);
+  opacity: 0.95;
 }
 
 body:has(main.running) .k {
@@ -64,8 +69,38 @@ body:has(main.running) .k.on {
   color: #24140f;
 }
 
-@media (max-width: 700px) {
+/* Nízke okná (typické notebooky): menšia klávesnica, aby nerušila obsah. */
+@media (max-height: 800px) {
+  :root {
+    --kb-space: 30vh;
+  }
+
+  .kb-bg {
+    opacity: 0.5;
+  }
+
+  body:has(main.running) .kb-bg {
+    opacity: 0.8;
+  }
+
   .k {
+    height: clamp(22px, 4.8vh, 40px);
+    padding: 5px 8px;
+  }
+}
+
+@media (max-width: 700px) {
+  :root {
+    --kb-space: 30vh;
+  }
+
+  .kb {
+    transform: perspective(900px) rotateX(28deg) translateY(2vh);
+  }
+
+  .k {
+    height: clamp(24px, 5vh, 44px);
+    padding: 4px;
     font-size: 0.45rem;
   }
 }

@@ -41,8 +41,16 @@ Výsledky sú v Tab.~\ref{tab:func}.
   \end{tabularx}
 \end{table}
 
-Počet udalostí vyplýva z toho, že jeden pokus má 37 stlačení a 37
-uvoľnení, teda 74 udalostí.
+Počet udalostí vyplýva z toho, že jeden pokus s vetou má 37 stlačení a 37
+uvoľnení, teda 74 udalostí (pri slove je to 20).
+
+Tento test sa vykonal pred zavedením režimu slova. Neskoršie zmeny
+(automatické uloženie relácie, okamžité zrušenie pokusu pri Backspace alebo
+nesprávnom znaku, výber režimu) sa overili
+prekladom klienta, ručným vyskúšaním režimu slova a simuláciou komponentu
+merania v prostredí jsdom (nesprávny znak vyprázdni pole a zobrazí
+hlásenie); automatizovaný test v prehliadači sa po týchto zmenách
+neopakoval.
 
 Pri refaktoringu klienta sa navyše porovnali snímky obrazoviek pôvodnej
 a novej verzie pri šírke okna 1280 a 390 bodov (9 stavov aplikácie v každej
@@ -276,9 +284,34 @@ vnímať opatrne: pri troch až piatich pokusoch na osobu mení jeden pokus
 
 % ----- Návrhy na zlepšenie -----
 Presnosť by sa dala zlepšiť väčším počtom pokusov a relácií na účastníka,
-odmietnutím pokusov s opravou už na klientovi (aby sa neignorovali až na
-serveri) a kalibráciou prahu pre neznámeho používateľa na samostatnej
+kalibráciou prahu pre neznámeho používateľa na samostatnej
 validačnej množine. Ako neznámy bol zatiaľ označený jediný pokus, a to pri
 účastníkovi, ktorý bol inak správne rozpoznaný v štyroch z piatich pokusov.
 Môže to naznačovať, že prah~3 je dosť prísny, no jeden prípad na takýto záver
 nestačí.
+
+% ----- Porovnanie vety a slova -----
+\subsection{Porovnanie vety a slova}
+\label{sec:test-porovnanie}
+
+Na porovnanie režimov slúži koncový bod \code{/api/compare} a obrázok
+\code{accuracy\_chart.png}, ktorý server prekreslí po každom uložení novej
+relácie. Pre každý režim sa podľa protokolu z
+podkapitoly~\ref{sec:protokol} zobrazí presnosť top-1 a top-3, podiel pokusov
+označených ako neznáme, priemerný čas pokusu a počet príznakov (73 pre vetu,
+19 pre slovo). Výpočet sa robí len na účastníkoch, ktorí absolvovali oba
+režimy (podkapitola~\ref{sec:porovnanie}); ak ich je menej než dvaja,
+graf to uvedie v podtitule a zobrazí všetky dáta s poznámkou, že porovnanie
+nie je spravodlivé.
+
+Funkčnosť výpočtu sa overila na syntetických dátach troch účastníkov v oboch
+režimoch (správne počty príznakov 73 a 19 a rozdielne priemerné časy pokusu)
+a na existujúcich dátach (výsledky pre vetu sa po zavedení režimov nezmenili).
+Automatické prekreslenie obrázka sa overilo odoslaním relácie do dočasnej
+databázy cez testovacieho klienta FastAPI: po uložení súbor vznikol,
+opakované odoslanie tej istej relácie ani neplatný režim ho neprekreslili.
+V čase písania tohto dokumentu mal režim slova zozbierané dáta len od jedného
+účastníka, takže skutočné porovnanie ešte nemožno vyhodnotiť.
+
+\todo{doplniť tabuľku výsledkov porovnania vety a slova po zbere dát od aspoň
+troch účastníkov, ktorí absolvovali oba režimy}

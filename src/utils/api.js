@@ -20,9 +20,3 @@ export async function saveSession(meta, rows) {
   const response = await postJson("/api/sessions", { meta, rows });
   return { ok: response.ok, result: response.ok ? await response.json() : null };
 }
-
-export async function fetchComparison() {
-  const response = await fetch("/api/compare");
-  if (!response.ok) throw new Error("Nepodarilo sa načítať porovnanie");
-  return response.json();
-}

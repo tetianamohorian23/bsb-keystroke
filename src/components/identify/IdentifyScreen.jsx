@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EMPTY_MESSAGE, MODES } from "../../constants";
 import { useTypingAttempt } from "../../hooks/useTypingAttempt";
 import { identifyAttempt } from "../../utils/api";
+import { describeMistake } from "../../utils/mistake";
 import PhraseDisplay from "../typing/PhraseDisplay";
 import TypingHeader from "../typing/TypingHeader";
 import TypingInput from "../typing/TypingInput";
@@ -12,18 +13,18 @@ export default function IdentifyScreen({ mode: modeKey, onBack }) {
   const [result, setResult] = useState(null);
   const [message, setMessage] = useState(EMPTY_MESSAGE);
 
-  const attempt = useTypingAttempt({ target: mode.text, onEnter: finish, onMistake });
+  const attempt = useTypingAttempt({ target: mode.text, onEnter: finish });
+
+  // Staré hlásenie zmizne, keď účastník začne písať.
+  useEffect(() => {
+    if (attempt.text) setMessage(EMPTY_MESSAGE);
+  }, [attempt.text]);
 
   function retry() {
     setResult(null);
     setMessage(EMPTY_MESSAGE);
     attempt.reset();
     attempt.inputRef.current?.focus();
-  }
-
-  function onMistake() {
-    setMessage({ text: "Chyba, začnite znova.", kind: "bad" });
-    attempt.reset();
   }
 
   async function finish() {
@@ -59,11 +60,16 @@ export default function IdentifyScreen({ mode: modeKey, onBack }) {
         label={`${mode.noun.toUpperCase()} NA OVERENIE`}
         title="Píšte prirodzene."
       />
-      <PhraseDisplay text={mode.text} typed={attempt.text} />
+      <PhraseDisplay text={mode.text} typed={attempt.text} mistake={attempt.mistake} />
       <TypingInput attempt={attempt} ariaLabel="Pole na rozpoznanie" />
       <div className="row">
-        <p className={message.kind} role="status">
-          {message.text}
+        <p
+          className={attempt.mistake ? "bad" : message.kind}
+          role="status"
+        >
+          {attempt.mistake
+            ? describeMistake(attempt.mistake)
+            : message.text || (attempt.text || result ? "" : "Začnite písať, text sa zobrazuje priamo vo vete.")}
         </p>
         <p className="attempt-count">Enter — odoslať</p>
       </div>

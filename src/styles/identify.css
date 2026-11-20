@@ -31,3 +31,12 @@
 .identify-actions button {
   margin-top: 0 !important;
 }
+
+.running .identify-results h2 {
+  font-size: clamp(1.4rem, 1.8vw, 2rem);
+}
+
+.running .match {
+  padding: 10px 0;
+  font-size: clamp(1rem, 1.2vw, 1.3rem);
+}

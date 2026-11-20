@@ -3,9 +3,9 @@ function charState(typed, char, index) {
   return index === typed.length ? "cur" : "";
 }
 
-export default function PhraseDisplay({ text, typed }) {
+export default function PhraseDisplay({ text, typed, mistake }) {
   return (
-    <div className="phrase" aria-hidden="true">
+    <div className={`phrase${mistake ? " shake" : ""}`} aria-hidden="true">
       {[...text].map((char, i) => (
         <span className={charState(typed, char, i)} key={i}>
           {char === " " ? " " : char}

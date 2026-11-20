@@ -60,22 +60,29 @@ do priečinka \code{dist/}.
 % Číslovaný zoznam.
 \begin{enumerate}
   \item Na úvodnej obrazovke zadajte meno a priezvisko, vyberte zariadenie
-        a klávesnicu a zaškrtnite súhlas. Tlačidlo „Začať meranie“ sa
-        aktivuje až po vyplnení mena a súhlasu.
-  \item Napíšte zobrazenú vetu rovnako, ako bežne píšete, a potvrďte ju
-        klávesom Enter. Pokus s nesprávnym textom alebo neuvoľnenou klávesou
-        sa nezapočíta.
+        a klávesnicu (pri stolovom počítači nie je ponuka „Vstavaná“),
+        v poli „Čo budete písať“ zvoľte vetu alebo slovo a zaškrtnite súhlas.
+        Tlačidlo „Začať meranie“ sa aktivuje až po vyplnení mena a súhlasu.
+  \item Napíšte zobrazený text rovnako, ako bežne píšete, a potvrďte ho
+        klávesom Enter. Backspace a Delete nefungujú: ich stlačenie aj
+        nesprávny znak pokus nezapočítajú: vstup sa na chvíľu zamkne,
+        zobrazený text sa zatrasie a hlásenie vysvetlí, čo sa stalo; potom
+        písanie začnete odznova a počítadlo sa nezvýši. Pokus
+        s neuvoľnenou klávesou sa nezapočíta.
   \item Po 15 správnych pokusoch sa zobrazí súhrn (počet pokusov, priemerná
-        doba držania klávesy a priemerný čas napísania vety).
-  \item Tlačidlom „Odoslať na server“ sa relácia uloží do databázy.
-        Opakované odoslanie tej istej relácie sa nezapíše znova.
+        doba držania klávesy a priemerný čas napísania textu).
+  \item Relácia sa na server uloží automaticky, tlačidlo na odoslanie nie je
+        potrebné. Ak uloženie zlyhá, zobrazia sa tlačidlá „Skúsiť znova“
+        a „Stiahnuť CSV“. Opakované odoslanie tej istej relácie sa nezapíše
+        znova.
 \end{enumerate}
 
 % ----- Identifikácia pokusu -----
 \subsection{Identifikácia pokusu}
 
 Na úvodnej obrazovke tlačidlo „Rozpoznať pokus“ otvorí režim, v ktorom
-účastník napíše vetu jedenkrát. Server vráti troch najpodobnejších
+účastník napíše zvolený text (vetu alebo slovo, podľa režimu zvoleného na
+úvodnej obrazovke) jedenkrát. Server vráti troch najpodobnejších
 účastníkov s relatívnou mierou podobnosti, alebo označí pokus ako neznámy.
 Režim vyžaduje, aby v databáze existovali relácie s dostatočným počtom
 platných pokusov.
@@ -93,6 +100,17 @@ troma najbližšími šablónami, nie pravdepodobnosť zhody.
            a relatívna miera podobnosti troch najlepších kandidátov.}
   \label{fig:identify}
 \end{figure}
+
+% ----- Porovnanie vety a slova -----
+\subsection{Graf presnosti}
+
+Po každom uložení novej relácie server sám prekreslí súbor
+\code{backend/accuracy\_chart.png}: stĺpcový graf presnosti top-1 a top-3 pre
+vetu a slovo. Na webovej stránke sa nezobrazuje, otvorí sa ako obyčajný
+obrázok. Porovnanie je spravodlivé len vtedy, keď aspoň dvaja účastníci
+písali vetu aj slovo; inak to graf uvedie v podtitule. Obrázok sa dá
+prekresliť aj ručne: \code{python -c "import main; main.render\_chart()"}
+v priečinku \code{backend}.
 
 % ----- Demonštračné video -----
 \subsection{Demonštračné video}
@@ -157,22 +175,24 @@ na testovanie).
       Na danom porte beží iná aplikácia, nie server tohto projektu. Overte
       \code{/api/health}; správna odpoveď obsahuje \code{status: ok}. \\
     \hline
-    Aplikácia v prehliadači nevie odoslať dáta &
+    Uloženie relácie na server zlyhá &
       Vite presmeruje \code{/api} na adresu zo súboru \code{vite.config.js}
       (predvolene \code{http://127.0.0.1:8000}). Ak server beží na inom porte,
       upravte adresu v tomto súbore. \\
     \hline
-    „Chyba servera“ po odoslaní &
-      Server nebeží alebo vrátil chybu; pozrite výpis servera. \\
+    „Uloženie zlyhalo“ na záverečnej obrazovke &
+      Server nebeží alebo vrátil chybu; pozrite výpis servera. Použite
+      „Skúsiť znova“ alebo „Stiahnuť CSV“. \\
     \hline
     Účastník chýba vo vyhodnotení &
       Pokusy sú neplatné alebo má menej ako 11 pokusov. Skontrolujte relácie
       cez \code{/api/sessions} a \code{/api/sessions/\{id\}}: platný pokus má
-      presne 74 udalostí. \\
+      presne 74 udalostí pri vete (37 stlačení a 37 uvoľnení) alebo 20 pri slove. \\
     \hline
-    Pokus sa po Enter vynuluje &
-      Text sa nezhoduje s vetou alebo nie sú uvoľnené všetky klávesy.
-      Napíšte vetu znova bez opráv. \\
+    Pokus sa vynuluje počas písania &
+      Bol stlačený Backspace alebo Delete alebo nesprávny znak: vstup sa
+      na chvíľu zamkne, zobrazí sa dôvod a pokus sa začína odznova. Po Enter sa pokus vynuluje aj vtedy, keď nie sú
+      uvoľnené všetky klávesy. \\
     \hline
   \end{tabularx}
 \end{table}

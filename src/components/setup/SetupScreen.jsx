@@ -1,6 +1,6 @@
 import SetupCard from "./SetupCard";
 
-export default function SetupScreen({ setup, onChange, onStart, onIdentify, onCompare }) {
+export default function SetupScreen({ setup, onChange, onStart, onIdentify }) {
   return (
     <div className="setup-layout">
       <section className="intro">
@@ -14,7 +14,7 @@ export default function SetupScreen({ setup, onChange, onStart, onIdentify, onCo
             <b>15</b> opakovaní
           </span>
           <span>
-            <b>01</b> časovanie kláves
+            <b>1</b> časovanie kláves
           </span>
           <span>
             <b>0</b> hesiel
@@ -26,7 +26,6 @@ export default function SetupScreen({ setup, onChange, onStart, onIdentify, onCo
         onChange={onChange}
         onStart={onStart}
         onIdentify={onIdentify}
-        onCompare={onCompare}
       />
     </div>
   );

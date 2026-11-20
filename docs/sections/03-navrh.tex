@@ -9,13 +9,16 @@ Systém musí spĺňať tieto požiadavky:
 \begin{itemize}
   \item zaznamenať pre každé stlačenie klávesy čas stlačenia aj uvoľnenia
         s rozlíšením lepším ako milisekunda,
-  \item zabezpečiť, aby všetci účastníci písali tú istú vetu rovnakým
-        spôsobom (bez opráv a bez vkladania textu),
+  \item zabezpečiť, aby všetci účastníci písali ten istý text (dlhšiu vetu
+        alebo krátke slovo) rovnakým spôsobom (bez opráv a bez vkladania
+        textu),
   \item uložiť namerané údaje v tvare vhodnom na ďalšie spracovanie,
   \item z jedného nového pokusu určiť najpodobnejších účastníkov a posúdiť,
         či ide o neznámu osobu,
   \item umožniť vyhodnotenie úspešnosti na dátach, ktoré neboli použité
-        na tvorbu šablón.
+        na tvorbu šablón,
+  \item umožniť porovnať, ako dobre rozpoznávanie funguje pri dlhej vete
+        a pri krátkom slove.
 \end{itemize}
 
 % ----- Architektúra -----
@@ -35,7 +38,7 @@ cez HTTP.
       box/.style={draw, rounded corners=4pt, thick, minimum width=3.4cm, minimum height=1.9cm,
                   align=center, fill=gray!10},
       lbl/.style={font=\small, align=center, inner sep=2pt},
-      cap/.style={font=\footnotesize\itshape, text=gray},
+      capt/.style={font=\footnotesize\itshape, text=gray},
       >={Stealth[length=3mm]}, node distance=2.6cm]
     % tri bloky vedľa seba: klient -> server -> databáza
     \node[box] (ui)  {\textbf{Webová aplikácia}\\[3pt]\small React, prehliadač};
@@ -45,49 +48,72 @@ cez HTTP.
     \draw[<->, thick] (ui) -- node[above, lbl] {JSON\\cez HTTP} (api);
     \draw[<->, thick] (api) -- node[above, lbl] {SQL} (db);
     % popisky pod blokmi
-    \node[cap, below=4pt of ui]  {klient};
-    \node[cap, below=4pt of api] {server};
-    \node[cap, below=4pt of db]  {úložisko};
+    \node[capt, below=4pt of ui]  {klient};
+    \node[capt, below=4pt of api] {server};
+    \node[capt, below=4pt of db]  {úložisko};
   \end{tikzpicture}
   \caption{Architektúra systému.}
   \label{fig:arch}
 \end{figure}
 
 Klient pracuje v štyroch stavoch: príprava relácie, meranie, identifikácia
-jedného pokusu a záverečná obrazovka s možnosťou odoslať dáta na server.
+jedného pokusu a záverečná obrazovka, na ktorej sa relácia uloží na server
+automaticky. Graf presnosti pre vetu a slovo vytvára server ako obrázok po
+každom uložení novej relácie (podkapitola~\ref{sec:porovnanie}).
 
 % ----- Zber údajov -----
 \subsection{Zber údajov}
 
-Účastník zadá meno, vyberie zariadenie (notebook alebo stolný počítač)
-a typ klávesnice (vstavaná, externá USB, externá Bluetooth) a vyjadrí súhlas
-so záznamom. Následne \textbf{15-krát} napíše vetu
-\emph{„Every keystroke tells a unique story.“} (37 znakov) a každý pokus
-potvrdí klávesom Enter.
+Účastník zadá meno, vyberie zariadenie (notebook alebo stolný počítač),
+typ klávesnice (vstavaná, externá USB, externá Bluetooth; pri stolovom
+počítači sa vstavaná klávesnica neponúka) a režim písania a vyjadrí súhlas
+so záznamom. Režim môže byť:
+% Odrážkový zoznam.
+\begin{itemize}
+  \item \code{phrase}: veta \emph{„Every keystroke tells a unique story.“}
+        (37 kláves, 73 príznakov),
+  \item \code{word}: slovo \emph{„biometrics“} (10 kláves, 19 príznakov).
+\end{itemize}
+Následne \textbf{15-krát} napíše zvolený text a každý pokus potvrdí klávesom
+Enter. Krátke slovo zrýchľuje zber, lebo preklep stojí niekoľko sekúnd
+namiesto celej vety.
 
 Na meranie času sa používa \code{performance.now()}. Čas každej udalosti sa
 ukladá relatívne k prvému stlačeniu v danom pokuse. Klávesy Shift, Caps Lock,
 Ctrl, Alt, Meta, Tab a Escape sa nezaznamenávajú. Opakované udalosti pri
 podržaní klávesy sa blokujú. Vkladanie, vystrihovanie, presúvanie textu
-a kontextové menu sú vo vstupnom poli zakázané.
+a kontextové menu sú vo vstupnom poli zakázané. Vstupné pole je skryté: napísané
+znaky sa zobrazujú priamo v zobrazenom texte (správny znak zelenou, chybný
+červene, blikajúci kurzor pred ďalším znakom), podobne ako v aplikácii
+Monkeytype. Pole sa po kliknutí kamkoľvek znova zaostrí.
 
-Pokus sa zamietne a účastník ho musí zopakovať, ak:
+Opravy sú zakázané, aby pokus obsahoval len čisté písanie bez opráv.
+Klávesy Backspace a Delete sa nevykonajú: ich stlačenie aj napísanie
+nesprávneho znaku (text, ktorý nie je začiatkom cieľového textu) spustia
+chybový stav: vstup sa na 1,6~s zamkne (klávesy sa ignorujú), zobrazený text
+sa zatrasie, nesprávny znak sa zvýrazní a hlásenie vysvetlí, čo sa stalo
+(napríklad „Nesprávny znak „x“, očakávalo sa „o““). Potom sa pokus vynuluje
+a písanie sa začne odznova. Počítadlo opakovaní sa pritom nezvyšuje. Pokus sa navyše zamietne
+po stlačení Enter, ak:
 % Odrážkový zoznam.
 \begin{itemize}
-  \item napísaný text sa nezhoduje s vetou,
+  \item napísaný text sa nezhoduje s cieľovým textom,
   \item počet stlačení sa líši od počtu uvoľnení (nie všetky klávesy boli
         uvoľnené).
 \end{itemize}
 Na strane servera sa navyše pri vytváraní šablón ignoruje každý pokus,
-ktorý nemá presne 37 stlačení a 37 uvoľnení (podkapitola~\ref{sec:priznaky}).
+ktorý nemá presne $n$ stlačení a $n$ uvoľnení, kde $n=37$ pre vetu a $n=10$
+pre slovo (podkapitola~\ref{sec:priznaky}).
 
 % ----- Formát údajov -----
 \subsection{Formát údajov}
 
 Každá klávesová udalosť je jeden riadok s poľami uvedenými v
 Tab.~\ref{tab:format}. Relácia sa na server odosiela ako objekt
-\code{\{meta, rows\}}, kde \code{meta} obsahuje identifikáciu účastníka
-a relácie a \code{rows} zoznam udalostí všetkých pokusov.
+\code{\{meta, rows\}}, kde \code{meta} obsahuje identifikáciu účastníka,
+relácie a režim a \code{rows} zoznam udalostí všetkých pokusov. Relácie
+uložené pred zavedením režimov nemajú v \code{meta} pole \code{mode}
+a považujú sa za reláciu s vetou (\code{phrase}).
 
 % Tabuľka: Polia záznamu o klávesovej udalosti.
 \begin{table}[ht]
@@ -103,7 +129,10 @@ a relácie a \code{rows} zoznam udalostí všetkých pokusov.
     \hline
     \code{session\_id} & čas začiatku relácie vo formáte ISO 8601 \\
     \hline
-    \code{device}, \code{keyboard} & zariadenie a typ klávesnice \\
+    \code{device}, \code{keyboard} & zariadenie a typ klávesnice (len
+      metaúdaj, do výpočtov nevstupuje) \\
+    \hline
+    \code{mode} & režim písania: \code{phrase} alebo \code{word} \\
     \hline
     \code{rep} & poradové číslo pokusu (1--15) \\
     \hline
@@ -122,7 +151,8 @@ a relácie a \code{rows} zoznam udalostí všetkých pokusov.
 \subsection{Príznaky}
 \label{sec:priznaky}
 
-Z jedného pokusu s $n=37$ klávesmi sa vytvorí vektor príznakov. Nech $d_i$ je
+Z jedného pokusu s $n$ klávesmi sa vytvorí vektor príznakov ($n=37$ pre
+vetu, $n=10$ pre slovo). Nech $d_i$ je
 čas $i$-teho stlačenia a $u_i$ čas uvoľnenia tej istej klávesy (prvá udalosť
 \code{up} s rovnakým \code{code}, ktorá nasleduje po stlačení). Potom platia
 vzorce~\eqref{eq:hold} a~\eqref{eq:gap}:
@@ -134,7 +164,7 @@ vzorce~\eqref{eq:hold} a~\eqref{eq:gap}:
 kde $h_i$ je doba držania klávesy (vzorec~\eqref{eq:hold}) a $g_i$ interval medzi
 dvoma po sebe idúcimi stlačeniami (vzorec~\eqref{eq:gap}). Vektor príznakov
 $\mathbf{x} = (h_1,\dots,h_n,g_1,\dots,g_{n-1})$
-má $m = 2n-1 = 73$ zložiek. Pokus s iným počtom stlačení či uvoľnení,
+má $m = 2n-1$ zložiek, teda 73 pre vetu a 19 pre slovo. Pokus s iným počtom stlačení či uvoľnení,
 s chýbajúcim uvoľnením, nečíselným alebo záporným časom je neplatný.
 
 % ----- Šablóna účastníka a miera podobnosti -----
@@ -180,7 +210,7 @@ kandidátmi, \textbf{nie pravdepodobnosť}, že ide o danú osobu.
 \label{sec:priklad}
 
 Postup z predchádzajúcich podkapitol je ilustrovaný na zjednodušenom príklade
-s tromi klávesmi. V skutočnom pokuse je $n=37$ a vektor má 73 zložiek,
+s tromi klávesmi. V skutočnom pokuse s vetou je $n=37$ a vektor má 73 zložiek,
 tu je $n=3$ a vektor má $m=2n-1=5$ zložiek. Všetky hodnoty sú vymyslené
 a slúžia len na vysvetlenie.
 
@@ -266,7 +296,8 @@ s takým použitím súhlasili. Tento dokument nepredstavuje právne posúdenie.
 
 Aby sa šablóny neotestovali na tých istých dátach, z ktorých vznikli, sa
 pokusy rozdelia podľa poradia: pokusy 1--10 slúžia na tvorbu šablóny,
-pokusy 11--15 na testovanie. Pre každý testovací pokus sa zistí poradie
+pokusy 11--15 na testovanie. Šablóny a vyhodnotenie sa počítajú osobitne pre
+každý režim, relácie s vetou a so slovom sa nemiešajú. Pre každý testovací pokus sa zistí poradie
 účastníkov a vyhodnotia sa:
 % Odrážkový zoznam.
 \begin{itemize}
@@ -277,3 +308,23 @@ pokusy 11--15 na testovanie. Pre každý testovací pokus sa zistí poradie
   \item \textbf{matica zámen}: počty predikcií pre každého skutočného
         účastníka.
 \end{itemize}
+
+Pri vyhodnotení sa navyše zistí \textbf{podiel pokusov označených ako neznáme}
+(\code{unknown\_rate}) a \textbf{priemerný čas pokusu} (\code{avg\_time\_s}),
+aby sa dala posúdiť aj praktická stránka režimu.
+
+% ----- Porovnanie režimov -----
+\subsection{Porovnanie režimov}
+\label{sec:porovnanie}
+
+Cieľom porovnania je zistiť, o koľko je rozpoznávanie podľa krátkeho slova
+horšie než podľa dlhej vety a či rýchlejší zber túto stratu vyvažuje.
+Použije sa rovnaký protokol (podkapitola~\ref{sec:protokol}) pre oba režimy.
+Aby bolo porovnanie spravodlivé, počíta sa na \textbf{spoločných účastníkoch},
+teda tých, ktorí absolvovali oba režimy; inak by sa rozdiel v presnosti nedal
+oddeliť od rozdielu v zložení účastníkov. Server vracia aj výsledky na
+všetkých účastníkoch (\code{all}) ako doplnok, ale ten sa nepovažuje za
+spravodlivé porovnanie. Server po každom uložení novej relácie
+prekreslí obrázok so stĺpcovým grafom top-1 a top-3 pre oba režimy
+(súbor \code{backend/accuracy\_chart.png}). Slovo má menej príznakov (19 oproti 73), preto sa
+očakáva nižšia presnosť, no kratší čas pokusu.

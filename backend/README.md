@@ -26,4 +26,10 @@ Endpoints:
 
 The typing mode is stored in `meta.mode` of each session; sessions without it are treated as `phrase`.
 
+After every newly saved session the server redraws `accuracy_chart.png` (top-1/top-3 accuracy of
+phrase vs. word, on participants who completed both modes when there are at least two of them,
+otherwise on everyone) in a background task, so saving is not slowed down. A failure to draw the
+chart never fails the save. The chart needs `matplotlib` (in `requirements.txt`). To draw it on
+demand: `python -c "import main; main.render_chart()"` from this folder.
+
 FastAPI also provides an interactive API browser at <http://127.0.0.1:8000/docs>.

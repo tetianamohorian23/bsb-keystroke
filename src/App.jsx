@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { DEFAULT_MODE } from "./constants";
-import CompareScreen from "./components/compare/CompareScreen";
 import DoneScreen from "./components/done/DoneScreen";
 import IdentifyScreen from "./components/identify/IdentifyScreen";
 import KeyboardBackground from "./components/KeyboardBackground";
@@ -18,7 +17,7 @@ const INITIAL_SETUP = {
 };
 
 export default function App() {
-  const [phase, setPhase] = useState("setup"); // setup | run | identify | compare | done
+  const [phase, setPhase] = useState("setup"); // setup | run | identify | done
   const [setup, setSetup] = useState(INITIAL_SETUP);
   const [session, setSession] = useState(null); // { meta, rows, summary }
   const typedKeys = usePressedKeys(phase === "run" || phase === "identify");
@@ -48,14 +47,13 @@ export default function App() {
   return (
     <>
       <KeyboardBackground pressed={pressed} />
-      <main className={phase === "run" ? "running" : ""}>
+      <main className={phase === "setup" ? "home" : phase === "done" ? "done" : "running"}>
         {phase === "setup" && (
           <SetupScreen
             setup={setup}
             onChange={setSetup}
             onStart={startRun}
             onIdentify={() => setPhase("identify")}
-            onCompare={() => setPhase("compare")}
           />
         )}
         {phase === "run" && (
@@ -64,7 +62,6 @@ export default function App() {
         {phase === "identify" && (
           <IdentifyScreen mode={setup.mode} onBack={backToSetup} />
         )}
-        {phase === "compare" && <CompareScreen onBack={backToSetup} />}
         {phase === "done" && <DoneScreen {...session} onBack={backToSetup} />}
       </main>
     </>

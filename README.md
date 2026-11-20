@@ -1,13 +1,14 @@
 # Biometrická autentifikácia podľa rytmu písania
 
 Webová aplikácia a server na **zber a rozpoznávanie rytmu písania** (angl. *keystroke dynamics*).
-Účastník 15-krát napíše vetu *„Every keystroke tells a unique story.“*, aplikácia zaznamená
+Účastník 15-krát napíše buď vetu *„Every keystroke tells a unique story.“*, alebo krátke slovo
+*„biometrics“* (režim si vyberie na začiatku), aplikácia zaznamená
 časy stlačenia a uvoľnenia každej klávesy a server z nich vytvorí šablónu účastníka. Z jedného
 nového pokusu potom určí, ktorému zo známych účastníkov sa rytmus písania najviac podobá.
 
 - **Klient:** React + Vite (prehliadač)
 - **Server:** FastAPI (Python) + SQLite
-- **Metóda:** šablóna = priemer a smerodajná odchýlka z pokusov 1–10, podobnosť = štandardizovaná euklidovská vzdialenosť nad 73 príznakmi (37 dôb držania + 36 intervalov medzi klávesmi)
+- **Metóda:** šablóna = priemer a smerodajná odchýlka z pokusov 1–10, podobnosť = štandardizovaná euklidovská vzdialenosť nad príznakmi (doby držania + intervaly medzi klávesmi): 73 príznakov pre vetu (37 kláves), 19 pre slovo (10 kláves). Šablóny sa tvoria zvlášť pre každý režim
 
 Úplný popis riešenia je v technickej dokumentácii ([`docs/`](docs/)).
 
@@ -75,24 +76,35 @@ Interaktívna dokumentácia API (Swagger): http://127.0.0.1:8000/docs.
 
 ## Ako aplikáciu používať
 
-1. **Zber dát.** Na úvodnej obrazovke zadajte meno a priezvisko, vyberte zariadenie a typ
-   klávesnice a zaškrtnite súhlas so záznamom. Tlačidlo „Začať meranie“ sa aktivuje až potom.
-2. Napíšte zobrazenú vetu rovnako, ako bežne píšete, a potvrďte ju klávesom **Enter**. Pokus
-   s nesprávnym textom alebo s neuvoľnenou klávesou sa nezapočíta. Všetkých pokusov je **15**.
-3. Po 15 pokusoch sa zobrazí súhrn. Tlačidlom **„Odoslať na server“** sa relácia uloží do
-   databázy (opakované odoslanie tej istej relácie sa nezapíše znova).
-4. **Rozpoznanie.** Na úvodnej obrazovke zvoľte „Rozpoznať pokus“ a napíšte vetu raz. Server
-   vráti troch najpodobnejších účastníkov, alebo pokus označí ako neznámy. Potrebuje na to
-   v databáze relácie s platnými pokusmi (odporúčané je aspoň 10 na účastníka).
+1. **Zber dát.** Na úvodnej obrazovke zadajte meno a priezvisko, vyberte zariadenie, typ
+   klávesnice (pri stolovom počítači nie je ponuka „Vstavaná“), režim (**veta** alebo
+   **slovo**) a zaškrtnite súhlas so záznamom. Tlačidlo „Začať meranie“ sa aktivuje až potom.
+2. Napíšte zobrazený text rovnako, ako bežne píšete, a potvrďte ho klávesom **Enter**.
+   **Backspace a Delete nefungujú**. Pri ich stlačení aj pri nesprávnom znaku sa pokus
+   nezapočíta: vstup sa na chvíľu (1,6 s) zamkne, veta sa zatrasie a zobrazí sa, čo sa stalo
+   (napr. „Nesprávny znak „x“, očakávalo sa „o““), potom sa písanie začne odznova. Pokus
+   s neuvoľnenou klávesou sa nezapočíta. Všetkých pokusov je **15**.
+3. Po 15 pokusoch sa relácia **uloží na server automaticky** (opakované odoslanie tej istej
+   relácie sa nezapíše znova). Ak uloženie zlyhá, zobrazí sa tlačidlo „Skúsiť znova“ a možnosť
+   stiahnuť CSV.
+4. **Rozpoznanie.** Na úvodnej obrazovke zvoľte režim a „Rozpoznať pokus“ a napíšte text raz.
+   Server vráti troch najpodobnejších účastníkov, alebo pokus označí ako neznámy. Potrebuje na
+   to v databáze relácie s platnými pokusmi v danom režime (odporúčané je aspoň 10 na účastníka).
+5. **Graf presnosti.** Po každom uložení novej relácie server sám prekreslí súbor
+   [`backend/accuracy_chart.png`](backend/accuracy_chart.png): stĺpcový graf presnosti (top-1
+   a top-3) pre vetu a slovo. Je spravodlivý len vtedy, keď aspoň dvaja účastníci písali vetu
+   aj slovo; inak to graf uvedie v podtitule. Na webovej stránke sa graf nezobrazuje.
 
 > Zobrazené percentá sú len **relatívna miera podobnosti** medzi tromi najbližšími šablónami,
 > nie pravdepodobnosť zhody.
 
 ## Vyhodnotenie úspešnosti
 
-Po zbere dát otvorte http://127.0.0.1:8000/api/evaluation. Šablóny sa vytvoria z pokusov 1–10
-a testujú sa na pokusoch 11–15; odpoveď obsahuje `top1`, `top3`, `total` a maticu zámen
-`confusion`. Výpočet môže trvať niekoľko sekúnd.
+Po zbere dát otvorte http://127.0.0.1:8000/api/evaluation (voliteľne `?mode=word`, predvolene
+`phrase`). Šablóny sa vytvoria z pokusov 1–10 a testujú sa na pokusoch 11–15; odpoveď obsahuje
+`top1`, `top3`, `unknown_rate`, `avg_time_s`, `total` a maticu zámen `confusion`. Porovnanie
+oboch režimov vráti http://127.0.0.1:8000/api/compare (`common` = len účastníci, ktorí
+absolvovali oba režimy, `all` = všetci). Výpočet môže trvať niekoľko sekúnd.
 
 ## API
 
@@ -103,8 +115,9 @@ a testujú sa na pokusoch 11–15; odpoveď obsahuje `top1`, `top3`, `total` a m
 | GET | `/api/sessions?limit=50&offset=0` | zoznam relácií bez udalostí |
 | GET | `/api/sessions/{id}` | metadáta a všetky udalosti jednej relácie |
 | GET | `/api/stats` | počet relácií a udalostí |
-| POST | `/api/identify` | identifikácia jedného pokusu (`{rows}`) |
-| GET | `/api/evaluation` | vyhodnotenie na pokusoch 11–15 |
+| POST | `/api/identify` | identifikácia jedného pokusu (`{rows, mode}`) |
+| GET | `/api/evaluation?mode=phrase\|word` | vyhodnotenie na pokusoch 11–15 |
+| GET | `/api/compare` | porovnanie režimov veta vs. slovo |
 
 Podrobnosti sú v [`backend/README.md`](backend/README.md).
 
@@ -115,7 +128,7 @@ Podrobnosti sú v [`backend/README.md`](backend/README.md).
 ├── index.html, package.json, vite.config.js
 ├── src/                 klient (React)
 │   ├── components/      obrazovky: setup, run, identify, done, typing
-│   ├── hooks/           useTypingAttempt, usePressedKeys
+│   ├── hooks/           useTypingAttempt, usePressedKeys, useRandomKeys
 │   ├── utils/           api, csv, summary
 │   └── styles/          CSS rozdelené podľa obrazovky
 ├── backend/             server (FastAPI): API, šablóny, identifikácia, vyhodnotenie
@@ -135,9 +148,9 @@ postupom `pdflatex main` → `bibtex main` → `pdflatex main` → `pdflatex mai
 |---|---|
 | `WinError 10013` pri spustení servera | Port 8000 používa iný program. Zastavte ho alebo spustite server na inom porte (`uvicorn main:app --port 8001`) a upravte adresu v `vite.config.js`. |
 | Odpoveď `detail: Not Found` na `/api/...` | Na porte beží iná aplikácia. Overte `/api/health`. |
-| Aplikácia nevie odoslať dáta | Server nebeží, alebo Vite presmerováva na zlý port (`vite.config.js`). |
-| Účastník chýba vo vyhodnotení | Má menej ako 11 platných pokusov. Platný pokus má presne 74 udalostí (37 stlačení a 37 uvoľnení). |
-| Pokus sa po Enter vynuluje | Text sa nezhoduje s vetou, alebo nie sú uvoľnené všetky klávesy. Napíšte vetu znova bez opráv. |
+| Uloženie na server zlyhá | Server nebeží, alebo Vite presmerováva na zlý port (`vite.config.js`). |
+| Účastník chýba vo vyhodnotení | Má menej ako 11 platných pokusov. Platný pokus má presne 74 udalostí pri vete (37 stlačení a 37 uvoľnení), 20 pri slove (10 + 10). |
+| Pokus sa vynuluje počas písania | Bol stlačený Backspace/Delete alebo nesprávny znak: vstup sa na chvíľu zamkne, zobrazí sa dôvod a pokus sa začína odznova. Po Enter sa vynuluje aj vtedy, keď nie sú uvoľnené všetky klávesy. |
 
 ## Osobné údaje
 

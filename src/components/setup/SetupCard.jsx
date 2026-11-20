@@ -1,6 +1,6 @@
 import { BUILT_IN_KEYBOARD, DESKTOP, DEVICES, KEYBOARDS, MODES } from "../../constants";
 
-export default function SetupCard({ setup, onChange, onStart, onIdentify, onCompare }) {
+export default function SetupCard({ setup, onChange, onStart, onIdentify }) {
   const set = (field) => (e) => onChange({ ...setup, [field]: e.target.value });
 
   // Stolový počítač nemá vstavanú klávesnicu.
@@ -55,7 +55,7 @@ export default function SetupCard({ setup, onChange, onStart, onIdentify, onComp
             ))}
           </select>
         </div>
-        <div className="full">
+        <div>
           <label className="f" htmlFor="mode">
             Čo budete písať
           </label>
@@ -84,9 +84,6 @@ export default function SetupCard({ setup, onChange, onStart, onIdentify, onComp
       </button>
       <button className="ghost" onClick={onIdentify}>
         Rozpoznať pokus
-      </button>
-      <button className="ghost" onClick={onCompare}>
-        Porovnať vetu a slovo
       </button>
       <small className="privacy-note">
         Údaje zostávajú chránené a slúžia iba na účely projektu.

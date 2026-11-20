@@ -4,9 +4,10 @@ V práci bol navrhnutý a implementovaný systém na zber časov stlačenia klá
 a na identifikáciu používateľa z jedného pokusu. Webová aplikácia zaznamenáva
 stlačenia a uvoľnenia kláves, serverová časť ich ukladá a z prvých desiatich
 pokusov každého účastníka vytvára štatistickú šablónu. Nový pokus sa porovná
-so šablónami pomocou štandardizovanej euklidovskej vzdialenosti. Klientska
-aplikácia bola overená funkčným testom a systém je dostupný v repozitári
-\cite{repo}.
+so šablónami pomocou štandardizovanej euklidovskej vzdialenosti. Okrem dlhej vety
+systém podporuje aj režim s jedným krátkym slovom a porovnanie oboch režimov.
+Klientska aplikácia bola overená funkčným testom a systém je dostupný
+v repozitári \cite{repo}.
 
 Na dátach piatich účastníkov dosiahol systém na 33 testovacích pokusoch
 úspešnosť top-1 78,79\,\% a top-3 96,97\,\%. Vzorka je však malá a nerovnomerná,
@@ -26,8 +27,8 @@ Výsledky treba brať ako orientačné. Vzorka je malá (päť účastníkov a 3
 testovacích pokusov) a nerovnomerná: jeden účastník prispel 15 pokusmi, iný len
 tromi. Všetky údaje vznikli na notebooku, preto sa nedá posúdiť vplyv zariadenia
 a vplyv klávesnice len veľmi obmedzene (dve relácie s externou USB
-klávesnicou). Klient neodmieta pokusy s opravou klávesom Backspace, takže sa
-takéto pokusy ignorujú až na serveri. Prah pre označenie neznámeho pokusu je
+klávesnicou). Režim slova má zatiaľ dáta len od jedného účastníka, preto
+porovnanie vety a slova ešte nie je vyhodnotené. Prah pre označenie neznámeho pokusu je
 zvolený empiricky a nebol kalibrovaný na samostatných dátach. Šablóny sa
 počítajú pri každej požiadavke nanovo, čo stačí pre malý súbor dát, no pre
 väčší by to bolo pomalé. Identifikátorom účastníka je meno, takže databáza
@@ -36,7 +37,8 @@ obsahuje osobné údaje.
 % ----- Smery ďalšieho vývoja -----
 V ďalšom vývoji je vhodné zozbierať dáta od viacerých účastníkov v niekoľkých
 reláciách, na rôznych zariadeniach a klávesniciach, aby sa dal vyhodnotiť ich
-vplyv. Klient by mal pokusy s opravou odmietať už počas písania. Prah
+vplyv. Po zbere dát od viacerých účastníkov v oboch režimoch treba vyhodnotiť
+porovnanie vety a slova. Prah
 neznámeho pokusu by sa mal kalibrovať na samostatnej validačnej množine a
 šablóny by sa mali ukladať namiesto opakovaného výpočtu. Namiesto mena by sa
 mal používať pseudonymný kód účastníka. Zaujímavé by bolo porovnať zvolenú

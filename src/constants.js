@@ -1,13 +1,15 @@
 // Režimy písania: dlhá veta alebo jedno krátke slovo.
 export const MODES = {
   phrase: {
-    label: "Veta (37 kláves)",
+    label: "Veta",
+    expectedMs: 11000, // typický čas pokusu: určuje mierku grafu rytmu pri prvom pokuse
     text: "Every keystroke tells a unique story.",
     noun: "vetu",
     header: "VETA NA ODPÍSANIE",
   },
   word: {
-    label: "Slovo (10 kláves)",
+    label: "Slovo",
+    expectedMs: 2200,
     text: "biometrics",
     noun: "slovo",
     header: "SLOVO NA ODPÍSANIE",
@@ -15,7 +17,8 @@ export const MODES = {
 };
 export const DEFAULT_MODE = "phrase";
 export const REPS = 15;
-export const WINDOW_MS = 6000;
+// Ako dlho zostane po chybe viditeľné vysvetlenie, kým sa pokus vynuluje.
+export const MISTAKE_MS = 1600;
 
 // Klávesy, ktoré sa nezaznamenávajú.
 export const IGNORED_KEYS = new Set([

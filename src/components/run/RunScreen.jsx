@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EMPTY_MESSAGE, MODES, REPS } from "../../constants";
 import { useTypingAttempt } from "../../hooks/useTypingAttempt";
+import { describeMistake } from "../../utils/mistake";
 import { summarizeAttempts } from "../../utils/summary";
 import PhraseDisplay from "../typing/PhraseDisplay";
 import RhythmCanvas from "../typing/RhythmCanvas";
@@ -15,11 +16,12 @@ export default function RunScreen({ meta, onComplete }) {
   const rows = useRef([]);
   const attemptsBars = useRef([]);
 
-  const attempt = useTypingAttempt({
-    target: mode.text,
-    onEnter: finish,
-    onMistake: () => reject("Chyba, začnite znova."),
-  });
+  const attempt = useTypingAttempt({ target: mode.text, onEnter: finish });
+
+  // Staré hlásenie zmizne, keď účastník začne písať.
+  useEffect(() => {
+    if (attempt.text) setMessage(EMPTY_MESSAGE);
+  }, [attempt.text]);
 
   function reject(text) {
     setMessage({ text, kind: "bad" });
@@ -57,6 +59,11 @@ export default function RunScreen({ meta, onComplete }) {
   }
 
   const progress = (rep / REPS) * 100;
+  const status = attempt.mistake
+    ? { text: describeMistake(attempt.mistake), kind: "bad" }
+    : message.text || attempt.text
+      ? message
+      : { text: "Začnite písať, text sa zobrazuje priamo vo vete.", kind: "" };
 
   return (
     <section className="card run-card">
@@ -69,9 +76,9 @@ export default function RunScreen({ meta, onComplete }) {
         label={mode.header}
         title="Udržte prirodzený rytmus."
       />
-      <PhraseDisplay text={mode.text} typed={attempt.text} />
+      <PhraseDisplay text={mode.text} typed={attempt.text} mistake={attempt.mistake} />
       <TypingInput attempt={attempt} ariaLabel="Pole na písanie" />
-      <RhythmCanvas bars={attempt.bars} ghost={ghost} />
+      <RhythmCanvas bars={attempt.bars} ghost={ghost} expectedMs={mode.expectedMs} />
       <div className="progress-meta">
         <span>POSTUP MERANIA</span>
         <b>{Math.round(progress)}%</b>
@@ -80,8 +87,8 @@ export default function RunScreen({ meta, onComplete }) {
         <i style={{ width: `${progress}%` }} />
       </div>
       <div className="row">
-        <p className={message.kind} role="status">
-          {message.text}
+        <p className={status.kind} role="status">
+          {status.text}
         </p>
         <p className="attempt-count">
           Opakovanie {rep} z {REPS}

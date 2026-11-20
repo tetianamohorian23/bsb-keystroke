@@ -1,10 +1,10 @@
 from pathlib import Path
-import json, sqlite3
+import json, sqlite3, threading
 from collections import defaultdict
 from math import sqrt
 
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -13,6 +13,9 @@ DB = Path(__file__).with_name("sessions.sqlite3")
 # "phrase": "Every keystroke tells a unique story."   "word": "biometrics"
 MODE_KEYS = {"phrase": 37, "word": 10}
 DEFAULT_MODE = "phrase"  # sessions saved before modes existed are phrase sessions
+CHART = Path(__file__).with_name("accuracy_chart.png")  # regenerated after every saved session
+MODE_LABELS = {"phrase": "Veta", "word": "Slovo"}
+_chart_lock = threading.Lock()
 app = FastAPI(title="Keystroke dynamics API")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
@@ -39,17 +42,17 @@ def events_dataframe(mode: str | None = None, participants: set[str] | None = No
     """
     with sqlite3.connect(DB) as db:
         records = db.execute(
-            "SELECT participant_id, meta_json, rows_json FROM sessions ORDER BY id"
+            "SELECT participant_id, session_id, meta_json, rows_json FROM sessions ORDER BY id"
         ).fetchall()
     rows = []
-    for participant_id, meta_json, rows_json in records:
+    for participant_id, session_id, meta_json, rows_json in records:
         session_mode = json.loads(meta_json).get("mode", DEFAULT_MODE)
         if mode is not None and session_mode != mode:
             continue
         if participants is not None and participant_id not in participants:
             continue
         rows.extend(
-            {**event, "participant_id": participant_id, "mode": session_mode}
+            {**event, "participant_id": participant_id, "session_id": session_id, "mode": session_mode}
             for event in json.loads(rows_json)
         )
     return pd.DataFrame(rows)
@@ -198,6 +201,62 @@ def compare_modes() -> dict:
     }
 
 
+def render_chart() -> None:
+    """Draw top-1/top-3 accuracy for each mode into accuracy_chart.png.
+
+    Uses participants who completed every mode when there are at least two of them
+    (a fair comparison), otherwise everyone, and says so in the subtitle.
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    with _chart_lock:
+        comparison = compare_modes()
+        fair = len(comparison["common_participants"]) >= 2
+        stats = comparison["common" if fair else "all"]
+        modes = list(MODE_KEYS)
+        series = [("top1", "top-1", "#ff754d"), ("top3", "top-3", "#3f9f78")]
+        width = 0.36
+
+        fig, ax = plt.subplots(figsize=(7, 4.2), dpi=150)
+        for offset, (key, label, color) in zip((-width / 2 - 0.01, width / 2 + 0.01), series):
+            values = [stats[mode][key] for mode in modes]
+            bars = ax.bar([i + offset for i in range(len(modes))], values, width, label=label, color=color)
+            for bar, value in zip(bars, values):
+                ax.annotate(f"{value:.0f} %", (bar.get_x() + bar.get_width() / 2, value),
+                            ha="center", va="bottom", fontsize=9, xytext=(0, 3), textcoords="offset points")
+        ax.set_xticks(range(len(modes)))
+        ax.set_xticklabels([
+            f"{MODE_LABELS[mode]}\n{stats[mode]['total']} testovacích pokusov" for mode in modes
+        ])
+        ax.set_ylim(0, 125)
+        ax.set_yticks([0, 25, 50, 75, 100])
+        ax.set_ylabel("Presnosť (%)")
+        ax.grid(axis="y", color="#dddddd", linewidth=0.6)
+        ax.set_axisbelow(True)
+        for side in ("top", "right"):
+            ax.spines[side].set_visible(False)
+        ax.legend(frameon=False, loc="upper center", ncol=2)
+        subtitle = (
+            f"na {len(comparison['common_participants'])} účastníkoch, ktorí písali vetu aj slovo"
+            if fair
+            else "zatiaľ nie sú aspoň dvaja účastníci s oboma režimami: porovnanie nie je spravodlivé"
+        )
+        fig.suptitle("Presnosť rozpoznávania: veta vs. slovo", fontsize=12, fontweight="bold")
+        ax.set_title(subtitle, fontsize=8.5, color="#666666")
+        fig.tight_layout()
+        fig.savefig(CHART)
+        plt.close(fig)
+
+
+def refresh_chart() -> None:
+    try:
+        render_chart()
+    except Exception as exc:  # the chart must never break saving a session
+        print(f"Could not render {CHART.name}: {exc}")
+
+
 def init_db():
     with sqlite3.connect(DB) as db:
         db.execute("CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, participant_id TEXT NOT NULL, session_id TEXT NOT NULL, meta_json TEXT NOT NULL, rows_json TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)")
@@ -256,7 +315,7 @@ def get_stats():
 
 
 @app.post("/api/sessions", status_code=201)
-def create_session(payload: Session):
+def create_session(payload: Session, background: BackgroundTasks):
     participant = str(payload.meta.get("participant_id", "")).strip()
     session_id = str(payload.meta.get("session_id", "")).strip()
     check_mode(str(payload.meta.get("mode", DEFAULT_MODE)))
@@ -271,7 +330,8 @@ def create_session(payload: Session):
             return {"id": existing[0], "status": "already_saved"}
         cur = db.execute("INSERT INTO sessions (participant_id, session_id, meta_json, rows_json) VALUES (?, ?, ?, ?)", (participant, session_id, json.dumps(payload.meta), json.dumps(payload.rows)))
         db.commit()
-        return {"id": cur.lastrowid, "status": "saved"}
+    background.add_task(refresh_chart)  # runs after the response is sent
+    return {"id": cur.lastrowid, "status": "saved"}
 
 
 @app.post("/api/identify")

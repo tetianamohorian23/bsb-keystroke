@@ -56,3 +56,145 @@
     padding: 19px;
   }
 }
+
+/* Úvodná obrazovka: širšie a väčšie rozloženie textu a formulára. */
+main.home {
+  max-width: min(1560px, 94vw);
+  padding-left: 3vw;
+  padding-right: 3vw;
+}
+
+/* Úvodné menu je pevné: stránka sa nescrolluje (na úzkych telefónoch ostáva scroll). */
+@media (min-width: 701px) {
+  html:has(main.home),
+  body:has(main.home) {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  main.home {
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
+main.home .setup-layout {
+  min-height: calc(100vh - var(--kb-space) - 90px);
+  grid-template-columns: 1fr 1.3fr;
+  gap: clamp(32px, 5vw, 100px);
+}
+
+main.home h1 {
+  font-size: clamp(3rem, 6.2vw, 6.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+main.home .lead {
+  max-width: 58ch;
+  font-size: clamp(1.05rem, 1.3vw, 1.3rem);
+}
+
+main.home .metric-chips {
+  gap: 14px;
+  margin-top: clamp(26px, 5vh, 48px);
+}
+
+main.home .metric-chips span {
+  padding: 16px 20px;
+  font-size: clamp(0.9rem, 1vw, 1.05rem);
+}
+
+main.home .metric-chips b {
+  font-size: clamp(1.4rem, 1.7vw, 1.8rem);
+}
+
+main.home .setup-card {
+  padding: clamp(24px, 3.2vh, 46px) clamp(28px, 3.4vw, 52px);
+}
+
+/* Zariadenie, klávesnica a režim v jednom riadku: nižší formulár neprekrýva klávesnicu. */
+main.home .setup-card .grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(14px, 2.1vh, 24px) clamp(16px, 1.6vw, 26px);
+}
+
+main.home .setup-card .f {
+  margin-bottom: 10px;
+  font-size: clamp(1.05rem, 1.2vw, 1.3rem);
+}
+
+main.home .setup-card input:not([type="checkbox"]),
+main.home .setup-card select {
+  padding: clamp(15px, 2.1vh, 21px) 20px;
+  font-size: clamp(1.1rem, 1.3vw, 1.4rem);
+}
+
+main.home .setup-card .section-label {
+  font-size: clamp(0.85rem, 0.95vw, 1.05rem);
+}
+
+main.home .setup-card .privacy-note {
+  font-size: clamp(0.78rem, 0.85vw, 0.95rem);
+}
+
+main.home .setup-card .check span {
+  font-size: clamp(0.95rem, 1.08vw, 1.15rem);
+}
+
+main.home .setup-card button {
+  padding: clamp(16px, 2.3vh, 22px) clamp(22px, 2vw, 32px);
+  font-size: clamp(1.1rem, 1.25vw, 1.35rem);
+}
+
+@media (max-width: 900px) {
+  main.home .setup-layout {
+    display: block;
+  }
+
+  main.home .setup-card .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  main.home .setup-card .grid > div:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Užšie okná: plaketky zostanú v jednom riadku. */
+@media (min-width: 901px) and (max-width: 1500px) {
+  main.home .metric-chips {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  main.home .metric-chips span {
+    padding: 12px 12px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  main.home .metric-chips b {
+    margin-right: 5px;
+    font-size: 1.15rem;
+  }
+}
+
+/* Väčší checkbox so súhlasom (zachováva svoje pevné rozmery). */
+main.home .setup-card .check input {
+  flex: 0 0 28px;
+  width: 28px;
+  min-width: 28px;
+  max-width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: 7px;
+}
+
+main.home .setup-card .check input:checked::after {
+  left: 7px;
+  top: 2px;
+  width: 8px;
+  height: 14px;
+}
