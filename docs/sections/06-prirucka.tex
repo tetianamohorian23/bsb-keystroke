@@ -99,48 +99,6 @@ troma najbližšími šablónami, nie pravdepodobnosť zhody.
   \label{fig:identify}
 \end{figure}
 
-% ----- Porovnanie vety a slova -----
-\subsection{Graf presnosti}
-
-Po každom uložení novej relácie server sám prekreslí súbor
-\code{backend/accuracy\_chart.png}: stĺpcový graf presnosti top-1 a top-3 pre
-vetu a slovo. Na webovej stránke sa nezobrazuje, otvorí sa ako obyčajný
-obrázok. Porovnanie je spravodlivé len vtedy, keď aspoň dvaja účastníci
-písali vetu aj slovo; inak to graf uvedie v podtitule. Obrázok sa dá
-prekresliť aj ručne: \code{python -c "import main; main.render\_chart()"}
-v priečinku \code{backend}.
-
-% ----- Demonštračné video -----
-\subsection{Demonštračné video}
-\label{sec:video}
-
-K riešeniu patrí krátke demonštračné video
-(\code{video/rytmus-pisania-45s.mp4}, 45 sekúnd, Full HD, so slovenským
-komentárom). Ukazuje zber rytmu písania, rozdiely medzi tromi účastníkmi,
-tvorbu šablón z prvých desiatich pokusov a identifikáciu jedného nového
-pokusu. Rytmy účastníkov a výsledky v ňom (úspešnosť top-1 78,8\,\% a top-3
-97,0\,\%, identifikácia s mierami podobnosti 65,4; 19,0 a 15,7\,\%) pochádzajú
-zo zozbieraných dát a z koncového bodu \code{/api/evaluation}, nie sú
-vymyslené. Video je určené na prezentáciu práce; na reprodukciu výsledkov
-slúži postup v podkapitole~\ref{sec:prirucka-repro}.
-
-% ----- Práca s API -----
-\subsection{Práca s API}
-
-\begin{lstlisting}
-# kontrola, že server beží
-curl http://127.0.0.1:8000/api/health
-
-# počet relácií a udalostí
-curl http://127.0.0.1:8000/api/stats
-
-# zoznam posledných 10 relácií
-curl "http://127.0.0.1:8000/api/sessions?limit=10"
-
-# vyhodnotenie úspešnosti (trvá niekoľko sekúnd)
-curl http://127.0.0.1:8000/api/evaluation
-\end{lstlisting}
-
 % ----- Reprodukovateľnosť -----
 \subsection{Reprodukovateľnosť}
 \label{sec:prirucka-repro}
@@ -150,51 +108,3 @@ Databáza so zozbieranými dátami obsahuje osobné údaje, preto sa
 nemá verzionovať; na reprodukciu vyhodnotenia je potrebné zozbierať nové dáta
 (minimálne 10 pokusov na účastníka na tvorbu šablóny a 1 až 5 pokusov
 na testovanie).
-
-% ----- Riešenie problémov -----
-\subsection{Riešenie problémov}
-
-% Tabuľka: Časté problémy pri spustení a ich riešenie.
-\begin{table}[ht]
-  \centering
-  \small
-  \caption{Časté problémy pri spustení a ich riešenie.}
-  \label{tab:problemy}
-  \begin{tabularx}{\textwidth}{|Y|Y|}
-    \hline
-    \rowcolor[gray]{0.9} \textbf{Príznak} & \textbf{Príčina a riešenie} \\
-    \hline
-    Na telefóne sa zobrazí „Nie je podporované“ &
-      Meranie funguje len na fyzickej klávesnici. Otvorte stránku na počítači
-      alebo notebooku; voľba „zobrazenie pre PC“ v mobilnom prehliadači
-      nepomôže. \\
-    \hline
-    \code{WinError 10013} pri spustení servera &
-      Port 8000 používa iný program. Zastavte ho alebo spustite server na
-      inom porte (\code{uvicorn main:app --port 8001}). \\
-    \hline
-    Odpoveď \code{detail: Not Found} na \code{/api/...} &
-      Na danom porte beží iná aplikácia, nie server tohto projektu. Overte
-      \code{/api/health}; správna odpoveď obsahuje \code{status: ok}. \\
-    \hline
-    Uloženie relácie na server zlyhá &
-      Vite presmeruje \code{/api} na adresu zo súboru \code{vite.config.js}
-      (predvolene \code{http://127.0.0.1:8000}). Ak server beží na inom porte,
-      upravte adresu v tomto súbore. \\
-    \hline
-    „Uloženie zlyhalo“ na záverečnej obrazovke &
-      Server nebeží alebo vrátil chybu; pozrite výpis servera. Použite
-      „Skúsiť znova“ alebo „Stiahnuť CSV“. \\
-    \hline
-    Účastník chýba vo vyhodnotení &
-      Pokusy sú neplatné alebo má menej ako 11 pokusov. Skontrolujte relácie
-      cez \code{/api/sessions} a \code{/api/sessions/\{id\}}: platný pokus má
-      presne 74 udalostí pri vete (37 stlačení a 37 uvoľnení) alebo 20 pri slove. \\
-    \hline
-    Pokus sa vynuluje počas písania &
-      Bol stlačený Backspace alebo Delete alebo nesprávny znak: vstup sa
-      na chvíľu zamkne, zobrazí sa dôvod a pokus sa začína odznova. Po Enter sa pokus vynuluje aj vtedy, keď nie sú
-      uvoľnené všetky klávesy. \\
-    \hline
-  \end{tabularx}
-\end{table}

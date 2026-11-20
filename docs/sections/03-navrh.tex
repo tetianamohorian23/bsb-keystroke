@@ -57,8 +57,7 @@ cez HTTP.
 
 Klient pracuje v štyroch stavoch: príprava relácie, meranie, identifikácia
 jedného pokusu a záverečná obrazovka, na ktorej sa relácia uloží na server
-automaticky. Graf presnosti pre vetu a slovo vytvára server ako obrázok po
-každom uložení novej relácie (podkapitola~\ref{sec:porovnanie}).
+automaticky.
 
 % ----- Zber údajov -----
 \subsection{Zber údajov}
@@ -308,7 +307,5 @@ Aby bolo porovnanie spravodlivé, počíta sa na \textbf{spoločných účastní
 teda tých, ktorí absolvovali oba režimy; inak by sa rozdiel v presnosti nedal
 oddeliť od rozdielu v zložení účastníkov. Server vracia aj výsledky na
 všetkých účastníkoch (\code{all}) ako doplnok, ale ten sa nepovažuje za
-spravodlivé porovnanie. Server po každom uložení novej relácie
-prekreslí obrázok so stĺpcovým grafom top-1 a top-3 pre oba režimy
-(súbor \code{backend/accuracy\_chart.png}). Slovo má menej príznakov (19 oproti 73), preto sa
+spravodlivé porovnanie. Slovo má menej príznakov (19 oproti 73), preto sa
 očakáva nižšia presnosť, no kratší čas pokusu.

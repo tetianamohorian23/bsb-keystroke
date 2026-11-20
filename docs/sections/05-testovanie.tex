@@ -52,11 +52,6 @@ merania v prostredí jsdom (nesprávny znak vyprázdni pole a zobrazí
 hlásenie); automatizovaný test v prehliadači sa po týchto zmenách
 neopakoval.
 
-Pri refaktoringu klienta sa navyše porovnali snímky obrazoviek pôvodnej
-a novej verzie pri šírke okna 1280 a 390 bodov (9 stavov aplikácie v každej
-šírke). Okrem plátna s grafom rytmu, ktorého obsah závisí od rýchlosti
-písania, boli snímky zhodné na úrovni jednotlivých pixelov.
-
 % ----- Vyhodnotenie identifikácie -----
 \subsection{Vyhodnotenie identifikácie}
 
@@ -231,8 +226,7 @@ vzorca~\eqref{eq:unknown} dáva $d_{\min}/\sqrt{m} = 4{,}798/\sqrt{73} \approx 0
 čo je výrazne menej ako prah 3, takže pokus sa neoznačí ako neznámy. Rozdiel
 vzdialeností medzi prvým a druhým účastníkom je výrazný (4,8 oproti 16,5);
 65,4\,\% je len relatívny podiel medzi tromi najbližšími šablónami
-(vzorec~\eqref{eq:share}). Rovnaký výsledok zobrazuje aj demonštračné video
-(podkapitola~\ref{sec:video}).
+(vzorec~\eqref{eq:share}).
 
 % ----- Diskusia -----
 \subsection{Diskusia}
@@ -250,57 +244,39 @@ Najslabšie je rozpoznaný Účastník~4 (40\,\%), ktorého
 pokusy sa najčastejšie zamieňajú s Účastníkom~3.
 
 % ----- Možné príčiny zámen -----
-Príčinu zámen sme neoverili, pretože sme nepreskúmali smerodajné odchýlky
-jednotlivých šablón. Možno má šablóna Účastníka~3 pri viacerých príznakoch
-veľký rozptyl. Štandardizovaná vzdialenosť (vzorec~\eqref{eq:dist}) delí
-odchýlku od priemeru smerodajnou odchýlkou, takže široká šablóna zmenšuje
-vzdialenosť aj pre pokusy iných účastníkov a priťahuje ich k sebe. Inou
-možnosťou je podobné tempo písania niektorých účastníkov. Hypotézy by sa dali
-overiť porovnaním smerodajných odchýlok šablón a vzdialeností chybne priradených
-pokusov.
+Príčiny zámen sme neoverili. Možno má šablóna Účastníka~3 veľký rozptyl:
+štandardizovaná vzdialenosť (vzorec~\eqref{eq:dist}) delí odchýlku od
+priemeru smerodajnou odchýlkou, takže široká šablóna zmenšuje vzdialenosť
+aj pre pokusy iných účastníkov a priťahuje ich k sebe. Inou možnosťou je
+podobné tempo písania niektorých účastníkov.
 
-% ----- Vplyv zariadenia a klávesnice -----
-Vplyv zariadenia sa nedá posúdiť, pretože všetky relácie vznikli na notebooku.
-Externá USB klávesnica sa použila v štyroch reláciách z ôsmich, no tri z nich
-patria jednému účastníkovi, takže vplyv klávesnice sa nedá oddeliť od vplyvu
-osoby a údajov je príliš málo na akýkoľvek záver. V ďalšom zbere by sa mali
-pokusy z rôznych klávesníc označovať a vyhodnocovať osobitne.
-
-% ----- Počet pokusov a kvalita šablóny -----
-Šablóna sa počíta z najviac desiatich pokusov, pričom každý pokus má 73
-príznakov. Pri takom malom počte pokusov je odhad smerodajnej odchýlky
-nepresný, čo môže rozpoznávanie zhoršovať. Účastník~1 má navyše len tri
-testovacie pokusy, pretože dva boli neplatné pre opravu klávesom Backspace,
-Rozdiely medzi účastníkmi (od 40\,\% do 100\,\%) treba
-vnímať opatrne: pri troch až piatich pokusoch na osobu mení jeden pokus
-úspešnosť účastníka o 20 až 33 percentuálnych bodov.
-
-% ----- Návrhy na zlepšenie -----
-Ako neznámy bol označený jediný pokus, a to pri účastníkovi, ktorý bol inak
-správne rozpoznaný v štyroch z piatich pokusov. Prah~3 môže byť príliš prísny,
-no jeden prípad na záver nestačí; prah by sa mal kalibrovať na samostatnej
-validačnej množine.
+% ----- Obmedzenia vyhodnotenia -----
+Vplyv zariadenia sa nedá posúdiť, pretože všetky relácie vznikli na
+notebooku; vplyv klávesnice sa nedá oddeliť od vplyvu osoby (tri zo štyroch
+relácií s externou USB klávesnicou patria jednému účastníkovi). Šablóna sa
+počíta z desiatich pokusov s 73 príznakmi, takže odhad smerodajnej odchýlky
+je nepresný. Pri troch až piatich testovacích pokusoch na osobu mení jeden
+pokus úspešnosť účastníka o 20 až 33 percentuálnych bodov, preto rozdiely
+medzi účastníkmi (od 40\,\% do 100\,\%) treba vnímať opatrne. Účastník~1
+má navyše len tri testovacie pokusy, pretože dva boli neplatné pre opravu
+klávesom Backspace. Jediný pokus označený ako neznámy patrí účastníkovi,
+ktorý bol inak správne rozpoznaný; prah~3 by sa preto mal kalibrovať
+na samostatnej validačnej množine.
 
 % ----- Porovnanie vety a slova -----
 \subsection{Porovnanie vety a slova}
 \label{sec:test-porovnanie}
 
-Na porovnanie režimov slúži koncový bod \code{/api/compare} a obrázok
-\code{accuracy\_chart.png}, ktorý server prekreslí po každom uložení novej
-relácie. Pre každý režim sa podľa protokolu z
+Na porovnanie režimov slúži koncový bod \code{/api/compare}. Pre každý režim sa podľa protokolu z
 podkapitoly~\ref{sec:protokol} zobrazí presnosť top-1 a top-3, podiel pokusov
 označených ako neznáme, priemerný čas pokusu a počet príznakov (73 pre vetu,
 19 pre slovo). Výpočet sa robí len na účastníkoch, ktorí absolvovali oba
 režimy (podkapitola~\ref{sec:porovnanie}); ak ich je menej než dvaja,
-graf to uvedie v podtitule a zobrazí všetky dáta s poznámkou, že porovnanie
-nie je spravodlivé.
+server vráti všetky dáta s poznámkou, že porovnanie nie je spravodlivé.
 
 Funkčnosť výpočtu sa overila na syntetických dátach troch účastníkov v oboch
 režimoch (správne počty príznakov 73 a 19 a rozdielne priemerné časy pokusu)
 a na existujúcich dátach (výsledky pre vetu sa po zavedení režimov nezmenili).
-Automatické prekreslenie obrázka sa overilo odoslaním relácie do dočasnej
-databázy cez testovacieho klienta FastAPI: po uložení súbor vznikol,
-opakované odoslanie tej istej relácie ani neplatný režim ho neprekreslili.
 V čase písania tohto dokumentu mal režim slova zozbierané dáta len od jedného
 účastníka, takže skutočné porovnanie ešte nemožno vyhodnotiť.
 

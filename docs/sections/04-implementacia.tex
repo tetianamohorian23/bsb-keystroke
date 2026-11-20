@@ -22,8 +22,6 @@ Použité technológie sú zhrnuté v Tab.~\ref{tab:tech}.
     \hline
     Spracovanie dát & pandas \\
     \hline
-    Graf presnosti & matplotlib (obrázok PNG) \\
-    \hline
     Úložisko & SQLite (súbor \code{backend/sessions.sqlite3}) \\
     \hline
   \end{tabularx}
@@ -157,37 +155,21 @@ prekreslí súbor \code{accuracy\_chart.png} knižnicou matplotlib: stĺpcový g
 top-1 a top-3 pre vetu a slovo, vypočítaný rovnako ako \code{/api/compare}.
 Odpoveď na uloženie sa tým nespomalí a zlyhanie kreslenia uloženie neovplyvní.
 
-Šablóny sa pri každej požiadavke na identifikáciu alebo vyhodnotenie
-počítajú nanovo zo všetkých uložených relácií daného režimu. Pre malý počet účastníkov
-je to postačujúce a zjednodušuje to konzistenciu (nie je potrebné
-šablóny pri pribudnutí nových dát invalidovať), pri väčšom objeme dát by
-bolo vhodné šablóny ukladať.
-
 % ----- Známe obmedzenia implementácie -----
 \subsection{Známe obmedzenia implementácie}
 \label{sec:obmedzenia}
 
-Pri analýze kódu sme našli tieto obmedzenia, ktoré treba zohľadniť
-pri interpretácii výsledkov:
+Pri interpretácii výsledkov treba zohľadniť tieto obmedzenia:
 \begin{itemize}
-  \item Pôvodná verzia klienta nerozpoznávala stlačenie Backspace ani
-        Delete ako chybu: pokus s opravou, ktorý skončil správnym textom,
-        klient prijal, no server ho pri tvorbe šablón ignoroval, pretože
-        mal viac ako $n$ stlačení. Táto chyba je opravená (Backspace,
-        Delete a nesprávny znak pokus okamžite zrušia), no skoršie
-        relácie ešte takéto pokusy obsahujú a server ich naďalej ignoruje.
-        Dve relácie so slovom zaznamenané pred opravou mali preto len časť
-        platných pokusov a boli z databázy odstránené.
+  \item Pokusy s opravou klávesom Backspace alebo Delete server pri tvorbe
+        šablón ignoruje (majú viac ako $n$ stlačení). Klient takéto pokusy
+        už nepripustí, no v skorších reláciách sa ešte nachádzajú.
   \item Zariadenie a typ klávesnice sa ukladajú len ako metaúdaje a do
         výpočtov nevstupujú.
-  \item Pôvodná verzia endpointu \code{/api/evaluation} zoskupovala pokusy
-        podľa dvojice (účastník, číslo pokusu) cez všetky relácie. Ak mal
-        účastník viac relácií, udalosti rovnakého čísla pokusu sa zlúčili,
-        pokus mal viac ako 37 stlačení a z vyhodnotenia vypadol. Chyba sa
-        prejavila pri analýze zozbieraných dát (jeden účastník so štyrmi
-        reláciami nemal v hodnotení žiadny pokus) a bola opravená:
-        pokusy sa teraz zoskupujú podľa trojice (účastník, relácia,
-        číslo pokusu).
+  \item Šablóny sa pri každej požiadavke na identifikáciu alebo vyhodnotenie
+        počítajú nanovo zo všetkých relácií daného režimu. Pre malý počet
+        účastníkov to stačí, pri väčšom objeme dát by bolo vhodné šablóny
+        ukladať.
   \item Pri troch a menej účastníkoch je metrika top-3 triviálne rovná
         100\,\%, keďže zoznam obsahuje všetkých účastníkov.
   \item Identifikátorom účastníka je zadané meno, takže databáza obsahuje
@@ -197,45 +179,6 @@ pri interpretácii výsledkov:
         \code{package-lock.json}, v \code{requirements.txt} sú uvedené
         len dolné hranice verzií.
 \end{itemize}
-
-% ----- Overenie pokusu na klientovi -----
-\subsection{Overenie pokusu na klientovi}
-
-Počas písania klient priebežne kontroluje, či je napísaný text začiatkom
-cieľového textu; nesprávny znak, Backspace alebo Delete spustia chybový
-stav (zámok vstupu, vysvetlenie a vynulovanie pokusu po krátkej chvíli). Priebeh overenia jedného pokusu po stlačení klávesu Enter ukazuje
-Obr.~\ref{fig:overenie}.
-
-% Obrázok (schéma nakreslená v TikZ): Overenie pokusu po stlačení klávesu Enter.
-\begin{figure}[ht]
-  \centering
-  \begin{tikzpicture}[
-      node distance=0.9cm and 1.6cm, >=Stealth,
-      stepbox/.style={draw, rounded corners, minimum width=4.4cm, minimum height=0.9cm, align=center},
-      test/.style={draw, diamond, aspect=2.6, inner sep=1pt, align=center, font=\small},
-      bad/.style={draw, rounded corners, minimum width=3.2cm, minimum height=0.9cm, align=center, fill=red!10, font=\small}]
-    \node[stepbox] (enter) {Enter};
-    \node[test, below=of enter] (t1) {text = cieľový\\text?};
-    \node[test, below=of t1] (t2) {počet stlačení\\= počet uvoľnení?};
-    \node[stepbox, below=of t2] (ok) {pokus sa započíta};
-    \node[bad, right=of t1] (b1) {zamietnuť: text\\sa nezhoduje};
-    \node[bad, right=of t2] (b2) {zamietnuť: klávesy\\neuvoľnené};
-    \draw[->] (enter) -- (t1);
-    \draw[->] (t1) -- node[left, font=\small] {áno} (t2);
-    \draw[->] (t2) -- node[left, font=\small] {áno} (ok);
-    \draw[->] (t1) -- node[above, font=\small] {nie} (b1);
-    \draw[->] (t2) -- node[above, font=\small] {nie} (b2);
-  \end{tikzpicture}
-  \caption{Overenie pokusu po stlačení klávesu Enter.}
-  \label{fig:overenie}
-\end{figure}
-
-Zamietnutý pokus sa nezapíše, pole sa vyprázdni a zobrazí sa chybová
-správa. V režime identifikácie sa navyše vyžaduje presne toľko stlačení,
-koľko má cieľový text znakov. Po 15. pokuse sa relácia uloží na server
-automaticky; ak uloženie zlyhá, obrazovka ponúkne zopakovanie alebo
-stiahnutie CSV a server pri opakovanom odoslaní rovnakej relácie nič
-nezapíše dvakrát.
 
 % ----- Ukážky kľúčového kódu -----
 \subsection{Ukážky kľúčového kódu}
@@ -351,16 +294,3 @@ GET /api/compare
       "common": {"phrase": {...}, "word": {...}},
       "all":    {"phrase": {...}, "word": {...}}}
 \end{lstlisting}
-
-% ----- Výkon -----
-\subsection{Výkon}
-
-Šablóny sa pri každej požiadavke počítajú nanovo zo všetkých relácií.
-Pôvodná verzia vyhodnotenia navyše volala identifikáciu pre každý
-testovací pokus, takže sa databáza načítala a šablóny prepočítali pri
-každom z nich: čas rástol súčinom (testovacie pokusy $\times$ objem dát)
-a pri ôsmich reláciách (8\,946 udalostí) trvala jedna požiadavka na
-\code{/api/evaluation} približne 90 sekúnd. Vyhodnotenie preto teraz
-vypočíta šablóny raz a použije ich pre všetky testovacie pokusy; výsledky sa
-tým nemenia. Pri identifikácii jedného pokusu sa šablóny stále počítajú pri
-každej požiadavke, čo je pre desiatky účastníkov prijateľné.
